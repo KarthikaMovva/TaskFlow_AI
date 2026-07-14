@@ -1,0 +1,4 @@
+### Get My Organizations
+
+GET http://localhost:5000/api/organizations
+Authorization: Bearer owner_token

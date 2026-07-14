@@ -1,0 +1,4 @@
+### Remove Member
+
+DELETE http://localhost:5000/api/organizations/3fada4b7-6cbb-45a2-b355-2320db8a8794/members/58c23ac3-fe7a-447f-a437-3ee47f32f52e
+Authorization: Bearer owner_token

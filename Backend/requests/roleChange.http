@@ -1,0 +1,9 @@
+### Promote Member to ADMIN
+
+PATCH http://localhost:5000/api/organizations/3fada4b7-6cbb-45a2-b355-2320db8a8794/members/bade89c5-02fb-4b68-91b1-124b3c510ae8/role
+Content-Type: application/json
+Authorization: Bearer owner_token
+
+{
+    "role": "ADMIN"
+}
