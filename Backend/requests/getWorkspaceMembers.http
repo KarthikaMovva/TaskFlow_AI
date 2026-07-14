@@ -1,0 +1,4 @@
+### Get Workspace Members
+
+GET http://localhost:5000/api/workspaces/74e81c0d-e87e-4fad-a3fe-2adc89ac6023/members
+Authorization: Bearer token

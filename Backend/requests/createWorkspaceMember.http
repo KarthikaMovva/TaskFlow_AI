@@ -1,0 +1,11 @@
+### Add Member To Workspace
+
+POST http://localhost:5000/api/workspaces/74e81c0d-e87e-4fad-a3fe-2adc89ac6023/members
+Authorization: Bearer token
+Content-Type: application/json
+
+
+{
+    "userId":"2ccc800f-9400-47bb-88d6-9c40d71ec917",
+    "role":"MEMBER"
+}

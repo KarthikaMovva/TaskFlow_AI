@@ -1,0 +1,10 @@
+### Update Workspace Member Role
+
+PATCH http://localhost:5000/api/workspaces/74e81c0d-e87e-4fad-a3fe-2adc89ac6023/members/565dc987-56c9-4970-a286-4184c0ea20dd/role
+Authorization: Bearer token
+Content-Type: application/json
+
+
+{
+    "role":"ADMIN"
+}
