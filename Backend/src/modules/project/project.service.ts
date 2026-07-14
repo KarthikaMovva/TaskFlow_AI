@@ -4,6 +4,13 @@ import {
     ProjectStatus,
     Role
 } from "@prisma/client";
+import {
+
+    requireWorkspaceAdmin
+
+}
+
+    from "../../utils/permission";
 
 /*
     Create a new project.
@@ -28,51 +35,58 @@ export async function createProject(
     /*
         Verify requester belongs to workspace.
     */
-    const membership =
-        await prisma.workspaceMember.findUnique({
+    // const membership =
+    //     await prisma.workspaceMember.findUnique({
 
-            where: {
+    //         where: {
 
-                userId_workspaceId: {
+    //             userId_workspaceId: {
 
-                    userId: requesterId,
+    //                 userId: requesterId,
 
-                    workspaceId
+    //                 workspaceId
 
-                }
+    //             }
 
-            }
+    //         }
 
-        });
+    //     });
 
-    if (!membership) {
+    // if (!membership) {
 
-        throw new Error(
-            "You are not a member of this workspace"
-        );
+    //     throw new Error(
+    //         "You are not a member of this workspace"
+    //     );
 
-    }
+    // }
 
-    /*
-        Only OWNER and ADMIN
-        can create projects.
-    */
-    if (
+    // /*
+    //     Only OWNER and ADMIN
+    //     can create projects.
+    // */
+    // if (
 
-        membership.role !== Role.OWNER &&
-        membership.role !== Role.ADMIN
+    //     membership.role !== Role.OWNER &&
+    //     membership.role !== Role.ADMIN
 
-    ) {
+    // ) {
 
-        throw new Error(
-            "You don't have permission to create projects"
-        );
+    //     throw new Error(
+    //         "You don't have permission to create projects"
+    //     );
 
-    }
+    // }
 
     /*
         Create project.
     */
+    await requireWorkspaceAdmin(
+
+        workspaceId,
+
+        requesterId
+
+    );
     const project =
         await prisma.project.create({
 

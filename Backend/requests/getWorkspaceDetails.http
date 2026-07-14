@@ -1,4 +1,4 @@
 ### Get Workspace Details
 
 GET http://localhost:5000/api/workspaces/474830c4-628f-419f-ac66-da711e8fe3f8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyY2NjODAwZi05NDAwLTQ3YmItODhkNi05YzQwZDcxZWM5MTciLCJpYXQiOjE3ODQwMjc4NDcsImV4cCI6MTc4NDAyODc0N30.Ha-7TxS4emnxDqqu22R7g-R9R84yfNDol3-32Y55RxA
+Authorization: Bearer token
