@@ -1,0 +1,8 @@
+### Protected Route Test(without token)
+
+GET http://localhost:5000/api/test-auth
+
+### Protected Route Test(with token)
+
+GET http://localhost:5000/api/test-auth
+Authorization: Bearer token

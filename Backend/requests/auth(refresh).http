@@ -1,0 +1,8 @@
+### Refresh Access Token
+
+POST http://localhost:5000/api/auth/refresh
+Content-Type: application/json
+
+{
+    "refreshToken":"refresh token"
+}
