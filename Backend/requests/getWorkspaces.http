@@ -1,0 +1,4 @@
+### Get Organization Workspaces
+
+GET http://localhost:5000/api/workspaces/organization/3fada4b7-6cbb-45a2-b355-2320db8a8794
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjZkN2IzOS1mMThhLTQ5OWMtYjJlOS03NDE0ZjMzODcxM2EiLCJpYXQiOjE3ODQwMjc3NDEsImV4cCI6MTc4NDAyODY0MX0.2z5_pacyJk4fjTtxGja0TD-xLkbvPP9jV6sIFigmfgo

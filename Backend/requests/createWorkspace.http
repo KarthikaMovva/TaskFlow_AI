@@ -1,0 +1,10 @@
+### Create Workspace
+
+POST http://localhost:5000/api/workspaces
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjZkN2IzOS1mMThhLTQ5OWMtYjJlOS03NDE0ZjMzODcxM2EiLCJpYXQiOjE3ODQwMjY5NDYsImV4cCI6MTc4NDAyNzg0Nn0.AMK4T3GyvrNyJ2bML26k1zTkV4N1C_7jQFAsfJStdQ8
+Content-Type: application/json
+
+{
+    "name":"Backend Team",
+    "organizationId":"3fada4b7-6cbb-45a2-b355-2320db8a8794"
+}
