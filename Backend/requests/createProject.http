@@ -13,3 +13,18 @@ Content-Type: application/json
 
     "status":"PLANNING"
 }
+### Create Project
+
+
+POST http://localhost:5000/api/projects
+Authorization: Bearer token
+Content-Type: application/json
+
+
+{
+    "name":"Testing Permission Refactor",
+
+    "description":"Checking helper integration",
+
+    "workspaceId":"74e81c0d-e87e-4fad-a3fe-2adc89ac6023"
+}
