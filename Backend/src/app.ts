@@ -35,6 +35,8 @@ import workspaceRoutes
     from "./modules/workspace/workspace.routes";
 import workspaceMemberRoutes
     from "./modules/workspaceMembers/workspaceMembers.routes";
+import projectRoutes
+    from "./modules/project/project.routes";
 
 
 /*
@@ -145,6 +147,11 @@ app.use(
 app.use(
     "/api/workspaces",
     workspaceMemberRoutes
+);
+
+app.use(
+    "/api/projects",
+    projectRoutes
 );
 
 app.get(
