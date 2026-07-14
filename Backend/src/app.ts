@@ -31,6 +31,8 @@ import {
     from "./middleware/auth.middleware";
 import organizationRoutes
     from "./modules/organization/organization.routes";
+import workspaceRoutes
+    from "./modules/workspace/workspace.routes";
 
 
 /*
@@ -132,6 +134,11 @@ app.use(
 app.use(
     "/api/organizations",
     organizationRoutes
+);
+
+app.use(
+    "/api/workspaces",
+    workspaceRoutes
 );
 
 app.get(
