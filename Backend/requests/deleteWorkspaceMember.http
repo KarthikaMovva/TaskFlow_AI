@@ -1,0 +1,4 @@
+### Remove Workspace Member
+
+DELETE http://localhost:5000/api/workspaces/74e81c0d-e87e-4fad-a3fe-2adc89ac6023/members/88dfbd04-b6c8-4e4f-97c2-0e2c5a024fb5
+Authorization: Bearer token
