@@ -1,0 +1,9 @@
+### Get Organization Members
+
+GET http://localhost:5000/api/organizations/3fada4b7-6cbb-45a2-b355-2320db8a8794/members
+Authorization: Bearer owner_token
+
+### Get Members
+
+GET http://localhost:5000/api/organizations/3fada4b7-6cbb-45a2-b355-2320db8a8794/members
+Authorization: Bearer owner_token

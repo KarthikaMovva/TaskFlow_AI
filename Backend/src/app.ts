@@ -29,6 +29,8 @@ import {
     protectRoute
 }
     from "./middleware/auth.middleware";
+import organizationRoutes
+    from "./modules/organization/organization.routes";
 
 
 /*
@@ -125,6 +127,11 @@ app.use(
 app.use(
     "/api/auth",
     authRoutes
+);
+
+app.use(
+    "/api/organizations",
+    organizationRoutes
 );
 
 app.get(
