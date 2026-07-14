@@ -1,17 +1,162 @@
+/*
+    Express Application Configuration
+
+    This file creates and configures our Express app.
+
+    Responsibilities:
+    -----------------
+    1. Initialize Express
+    2. Add global middleware
+    3. Register routes
+    4. Handle errors
+
+
+    Important:
+    This file DOES NOT start the server.
+
+    Starting the server happens in server.ts.
+*/
+
+
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
+import cookieParser from "cookie-parser";
 
+import authRoutes
+    from "../src/modules/auth.routes";
+import {
+    protectRoute
+}
+    from "./middleware/auth.middleware";
+
+
+/*
+    Create Express application instance.
+
+    This object represents our backend server.
+*/
 const app = express();
 
-app.use(cors());
 
-app.use(express.json());
 
-app.get("/", (req, res) => {
-    res.json({
-        success: true,
-        message: "TaskFlow AI Backend Running"
-    });
-});
+/*
+    Security Middleware
+
+    Helmet adds security-related HTTP headers.
+
+    Example protection:
+    - prevents some common attacks
+    - improves API security
+*/
+app.use(
+    helmet()
+);
+
+
+
+/*
+    CORS Middleware
+
+    Allows frontend applications
+    to communicate with backend.
+
+    Example:
+
+    Frontend:
+    http://localhost:3000
+
+    Backend:
+    http://localhost:5000
+
+*/
+app.use(
+    cors({
+        origin: "http://localhost:3000",
+        credentials: true,
+    })
+);
+
+
+
+/*
+    JSON Body Parser
+
+    Allows Express to read JSON requests.
+
+    Example request:
+
+    {
+        "email":"test@gmail.com",
+        "password":"123456"
+    }
+
+*/
+app.use(
+    express.json()
+);
+
+
+
+/*
+    Cookie Parser
+
+    Required later for:
+
+    - Refresh tokens
+    - Authentication cookies
+*/
+app.use(
+    cookieParser()
+);
+
+
+
+/*
+    Basic test route.
+
+    Purpose:
+    Check whether our Express application
+    is running.
+
+    Later this will be replaced by
+    proper route modules.
+*/
+app.use(
+    "/api/auth",
+    authRoutes
+);
+
+app.get(
+    "/",
+    (req, res) => {
+
+        res.json({
+            message:
+                "TaskFlow AI Backend Running 🚀"
+        });
+
+    }
+);
+
+app.get(
+    "/api/test-auth",
+    protectRoute,
+    (req, res) => {
+
+
+        res.json({
+
+            message:
+                "Protected route accessed",
+
+            user: req.user
+
+        });
+
+
+    }
+);
+
 
 export default app;

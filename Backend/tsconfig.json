@@ -1,14 +1,66 @@
 {
+  /*
+    TypeScript compiler configuration.
+
+    This file controls how TypeScript
+    converts our .ts files into JavaScript.
+  */
   "compilerOptions": {
+    /*
+      Target JavaScript version.
+
+      Node.js 22 supports modern JavaScript,
+      so we can use ES2022 features.
+    */
     "target": "ES2022",
+    /*
+      Module system used by Node.js.
+
+      CommonJS works well with Express,
+      ts-node, and Node backend projects.
+    */
     "module": "CommonJS",
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "strict": true,
+    /*
+      Allows importing packages normally.
+      
+      Example:
+      import express from "express";
+    */
     "esModuleInterop": true,
+    /*
+      Enables strict type checking.
+
+      This catches bugs during development.
+    */
+    "strict": true,
+    /*
+      Allows TypeScript to resolve JSON imports.
+    */
+    "resolveJsonModule": true,
+    /*
+      Folder containing TypeScript files.
+    */
+    "rootDir": "./src",
+    /*
+      Where compiled JavaScript will be generated.
+    */
+    "outDir": "./dist",
+    /*
+      Removes unnecessary files from output.
+    */
     "skipLibCheck": true
   },
+  /*
+    Files TypeScript should compile.
+  */
   "include": [
     "src"
+  ],
+  /*
+    Ignore generated files.
+  */
+  "exclude": [
+    "node_modules",
+    "dist"
   ]
 }
