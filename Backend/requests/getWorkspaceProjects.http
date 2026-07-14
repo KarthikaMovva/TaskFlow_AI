@@ -1,0 +1,4 @@
+### Get Workspace Projects
+
+GET http://localhost:5000/api/projects/workspace/74e81c0d-e87e-4fad-a3fe-2adc89ac6023
+Authorization: Bearer token

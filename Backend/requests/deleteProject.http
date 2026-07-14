@@ -1,0 +1,4 @@
+### Delete Project
+
+DELETE http://localhost:5000/api/projects/4582a1de-6543-4884-a47c-c6931eba5fbd
+Authorization: Bearer token

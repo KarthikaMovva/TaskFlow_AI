@@ -1,0 +1,15 @@
+### Create Project
+
+POST http://localhost:5000/api/projects
+Authorization: Bearer token
+Content-Type: application/json
+
+{
+    "name":"Authentication Module",
+
+    "description":"Implement complete authentication flow",
+
+    "workspaceId":"74e81c0d-e87e-4fad-a3fe-2adc89ac6023",
+
+    "status":"PLANNING"
+}
