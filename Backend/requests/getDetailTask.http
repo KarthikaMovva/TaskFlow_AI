@@ -1,0 +1,4 @@
+### Get Task Details
+
+GET http://localhost:5000/api/tasks/2ca9529c-19be-45c1-9ef1-342b597b7de4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjZkN2IzOS1mMThhLTQ5OWMtYjJlOS03NDE0ZjMzODcxM2EiLCJpYXQiOjE3ODQwODgxMzEsImV4cCI6MTc4NDA4OTAzMX0.ftUVBWTapaEkpp6dGGj48hXpP9AFjMTGd2L9se7sJP0
