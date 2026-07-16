@@ -1,0 +1,9 @@
+### Update Comment
+
+PATCH http://localhost:5000/api/comments/36a04b5b-68eb-45dc-9d84-c117af1aafef
+Authorization: Bearer token
+Content-Type: application/json
+
+{
+    "message": "Authentication API has been completed successfully."
+}

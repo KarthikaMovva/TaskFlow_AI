@@ -1,4 +1,4 @@
 ### Get Project Details
 
 GET http://localhost:5000/api/projects/4582a1de-6543-4884-a47c-c6931eba5fbd
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjZkN2IzOS1mMThhLTQ5OWMtYjJlOS03NDE0ZjMzODcxM2EiLCJpYXQiOjE3ODQwNTI1OTAsImV4cCI6MTc4NDA1MzQ5MH0.WWtTRs3MR0neQRDs1xdOi6S7B6ViNybBoRbqfiE9Peo
+Authorization: Bearer token

@@ -26,7 +26,8 @@ import cookieParser from "cookie-parser";
 import authRoutes
     from "../src/modules/auth.routes";
 import {
-    protectRoute
+    protectRoute,
+    AuthRequest
 }
     from "./middleware/auth.middleware";
 import organizationRoutes
@@ -39,6 +40,10 @@ import projectRoutes
     from "./modules/project/project.routes";
 import taskRoutes
     from "./modules/task/task.routes";
+import commentRoutes
+    from "./modules/comment/comment.routes";
+import KanbanRoutes
+    from "./modules/kanban/kanban.routes";
 
 
 /*
@@ -160,6 +165,18 @@ app.use(
     "/api/tasks",
     taskRoutes
 );
+app.use(
+    "/api/comments",
+    commentRoutes
+);
+// app.use(
+//     "/api",
+//     attachmentRoutes
+// );
+app.use(
+    "/api/kanban",
+    KanbanRoutes
+);
 
 app.get(
     "/",
@@ -176,7 +193,7 @@ app.get(
 app.get(
     "/api/test-auth",
     protectRoute,
-    (req, res) => {
+    (req: AuthRequest, res) => {
 
 
         res.json({

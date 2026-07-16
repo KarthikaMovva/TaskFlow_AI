@@ -128,3 +128,34 @@ export const updateTaskSchema = z.object({
 export type UpdateTaskInput =
 
     z.infer<typeof updateTaskSchema>;
+
+/*
+    Assign task validation
+*/
+
+export const assignTaskSchema = z.object({
+
+    assignedToId:
+
+        z.string()
+            .uuid(
+                "Invalid user id"
+            )
+
+});
+
+
+export type AssignTaskInput =
+
+    z.infer<typeof assignTaskSchema>;
+
+export const reorderTasksSchema = z.object({
+
+    taskIds: z
+        .array(z.string().uuid())
+        .min(1)
+
+});
+
+export type ReorderTasksInput =
+    z.infer<typeof reorderTasksSchema>;

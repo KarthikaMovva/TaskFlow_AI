@@ -98,7 +98,7 @@ export async function addMemberController(
         const member =
             await addMember(
 
-                req.params.workspaceId,
+                req.params.workspaceId as string,
 
                 req.user!.id,
 
@@ -158,7 +158,7 @@ export async function getWorkspaceMembersController(
 
             await getWorkspaceMembers(
 
-                req.params.workspaceId,
+                req.params.workspaceId as string,
 
                 req.user!.id
 
@@ -219,11 +219,11 @@ export async function updateMemberRoleController(
 
             await updateMemberRole(
 
-                req.params.workspaceId,
+                req.params.workspaceId as string,
 
                 req.user!.id,
 
-                req.params.memberId,
+                req.params.memberId as string,
 
                 data.role
 
@@ -277,11 +277,11 @@ export async function removeMemberController(
 
         await removeMember(
 
-            req.params.workspaceId,
+            req.params.workspaceId as string,
 
             req.user!.id,
 
-            req.params.memberId
+            req.params.memberId as string
 
         );
 

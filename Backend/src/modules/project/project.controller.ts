@@ -149,7 +149,7 @@ export async function getWorkspaceProjectsController(
 
             await getWorkspaceProjects(
 
-                req.params.workspaceId,
+                req.params.workspaceId as string,
 
                 req.user!.id
 
@@ -203,7 +203,7 @@ export async function getProjectController(
         const project =
             await getProjectById(
 
-                req.params.projectId,
+                req.params.projectId as string,
 
                 req.user!.id
 
@@ -265,7 +265,7 @@ export async function updateProjectController(
 
             await updateProject(
 
-                req.params.projectId,
+                req.params.projectId as string,
 
                 req.user!.id,
 
@@ -324,7 +324,7 @@ export async function deleteProjectController(
 
         await deleteProject(
 
-            req.params.projectId,
+            req.params.projectId as string,
 
             req.user!.id
 

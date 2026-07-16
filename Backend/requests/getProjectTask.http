@@ -1,4 +1,4 @@
 ### Get Project Tasks
 
 GET http://localhost:5000/api/tasks/project/ef3a8905-dcb6-470a-a349-ae7ee99db659
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyY2NjODAwZi05NDAwLTQ3YmItODhkNi05YzQwZDcxZWM5MTciLCJpYXQiOjE3ODQwNTM5MDAsImV4cCI6MTc4NDA1NDgwMH0.24NM1PcI_DgLPO1se6fUpUjb3h2J2A1zeW0JdKl3e8I
+Authorization: Bearer token

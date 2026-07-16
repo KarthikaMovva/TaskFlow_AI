@@ -1,5 +1,3 @@
-// Connect Prisma to PostgreSQL server
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,23 +7,195 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Enums are fixed values.
-// They improve data consistency.
-//
-// Example:
-// Instead of:
-// status = "working"
-// we use
-// IN_PROGRESS
+model User {
+  id                      String               @id @default(uuid())
+  name                    String
+  email                   String               @unique
+  password                String
+  avatar                  String?
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
+  emailVerified           Boolean              @default(false)
+  isActive                Boolean              @default(true)
+  aiHistory               AIHistory[]
+  account                 Account?
+  activities              Activity[]
+  attachments             Attachment[]
+  comments                Comment[]
+  notifications           Notification[]
+  ownedOrganizations      Organization[]       @relation("OrganizationOwner")
+  organizationMemberships OrganizationMember[]
+  refreshTokens           RefreshToken[]
+  assignedTasks           Task[]               @relation("AssignedTasks")
+  createdTasks            Task[]               @relation("CreatedTasks")
+  workspaceMemberships    WorkspaceMember[]
+}
 
-// User Role
+model Organization {
+  id         String               @id @default(uuid())
+  name       String
+  ownerId    String
+  createdAt  DateTime             @default(now())
+  owner      User                 @relation("OrganizationOwner", fields: [ownerId], references: [id])
+  members    OrganizationMember[]
+  workspaces Workspace[]
+}
+
+model OrganizationMember {
+  id             String       @id @default(uuid())
+  organizationId String
+  userId         String
+  role           Role         @default(MEMBER)
+  joinedAt       DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@unique([organizationId, userId])
+}
+
+model Workspace {
+  id             String            @id @default(uuid())
+  name           String
+  organizationId String
+  createdAt      DateTime          @default(now())
+  activities     Activity[]
+  meetings       Meeting[]
+  projects       Project[]
+  organization   Organization      @relation(fields: [organizationId], references: [id])
+  members        WorkspaceMember[]
+}
+
+model WorkspaceMember {
+  id          String    @id @default(uuid())
+  userId      String
+  workspaceId String
+  role        Role      @default(MEMBER)
+  joinedAt    DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@unique([userId, workspaceId])
+}
+
+model Task {
+  id           String       @id @default(uuid())
+  title        String
+  description  String?
+  status       TaskStatus   @default(TODO)
+  position     Float
+  priority     Priority     @default(MEDIUM)
+  projectId    String
+  assignedToId String?
+  createdById  String
+  dueDate      DateTime?
+  createdAt    DateTime     @default(now())
+  attachments  Attachment[]
+  comments     Comment[]
+  assignedTo   User?        @relation("AssignedTasks", fields: [assignedToId], references: [id])
+  createdBy    User         @relation("CreatedTasks", fields: [createdById], references: [id])
+  project      Project      @relation(fields: [projectId], references: [id])
+}
+
+model Project {
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  status      ProjectStatus @default(PLANNING)
+  workspaceId String
+  createdAt   DateTime      @default(now())
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id])
+  tasks       Task[]
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  message   String
+  taskId    String
+  userId    String
+  createdAt DateTime @default(now())
+  task      Task     @relation(fields: [taskId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Attachment {
+  id           String   @id @default(uuid())
+  fileName     String
+  fileUrl      String
+  publicId     String?
+  taskId       String
+  uploadedAt   DateTime @default(now())
+  fileSize     Int?
+  fileType     String?
+  uploadedById String
+  task         Task     @relation(fields: [taskId], references: [id])
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+}
+
+model Meeting {
+  id          String    @id @default(uuid())
+  title       String
+  transcript  String?
+  summary     String?
+  workspaceId String
+  createdAt   DateTime  @default(now())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  userId    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Account {
+  id                String @id @default(uuid())
+  userId            String @unique
+  provider          String
+  providerAccountId String
+  user              User   @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
+}
+
+model AIHistory {
+  id        String   @id @default(uuid())
+  type      AIType
+  input     String
+  output    String
+  userId    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Activity {
+  id          String    @id @default(uuid())
+  action      String
+  userId      String
+  workspaceId String
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+}
+
 enum Role {
   OWNER
   ADMIN
   MEMBER
 }
 
-// Project Status
 enum ProjectStatus {
   PLANNING
   ACTIVE
@@ -33,7 +203,6 @@ enum ProjectStatus {
   ARCHIVED
 }
 
-// Task Priority
 enum Priority {
   LOW
   MEDIUM
@@ -41,7 +210,6 @@ enum Priority {
   URGENT
 }
 
-// Task Status
 enum TaskStatus {
   TODO
   IN_PROGRESS
@@ -49,392 +217,15 @@ enum TaskStatus {
   DONE
 }
 
-// AI Feature Type
 enum AIType {
   TASK_GENERATION
   SPRINT_SUMMARY
   MEETING_NOTES
 }
 
-// Invitation Status
 enum InvitationStatus {
   PENDING
   ACCEPTED
   REJECTED
   EXPIRED
-}
-
-model User {
-  // Unique identifier
-  id                      String               @id @default(uuid())
-  // User display name
-  name                    String
-  // Login email
-  email                   String               @unique
-  // Hashed password
-  password                String
-  // Profile image
-  avatar                  String?
-  // Email verification status
-  emailVerified           Boolean              @default(false)
-  // Account active status
-  isActive                Boolean              @default(true)
-  createdAt               DateTime             @default(now())
-  updatedAt               DateTime             @updatedAt
-  // Existing relationships
-  ownedOrganizations      Organization[]       @relation("OrganizationOwner")
-  organizationMemberships OrganizationMember[]
-  workspaceMemberships    WorkspaceMember[]
-  createdTasks            Task[]               @relation("CreatedTasks")
-  assignedTasks           Task[]               @relation("AssignedTasks")
-  comments                Comment[]
-  notifications           Notification[]
-  refreshTokens           RefreshToken[]
-  aiHistory               AIHistory[]
-  activities              Activity[]
-  account                 Account?
-}
-
-// ORGANIZATION MODEL
-model Organization {
-  // Primary Key
-  id String @id @default(uuid())
-
-  // Organization Name
-  name String
-
-  // Owner ID
-  ownerId String
-
-  owner User @relation("OrganizationOwner", fields: [ownerId], references: [id])
-
-  // Organization Members
-  members OrganizationMember[]
-
-  // Organization Workspaces
-  workspaces Workspace[]
-
-  // Created Timestamp
-  createdAt DateTime @default(now())
-}
-
-// ORGANIZATION MEMBER
-model OrganizationMember {
-  // Primary Key
-  id String @id @default(uuid())
-
-  // Foreign Key → Organization
-  organizationId String
-
-  // Foreign Key → User
-  userId String
-
-  // User role inside organization
-  role Role @default(MEMBER)
-
-  // Organization Relation
-  organization Organization @relation(fields: [organizationId], references: [id])
-
-  // User Relation
-  user User @relation(fields: [userId], references: [id])
-
-  // Joined Date
-  joinedAt DateTime @default(now())
-
-  // Composite Unique Key
-  @@unique([organizationId, userId])
-}
-
-// WORKSPACE
-model Workspace {
-  // Primary Key
-  id String @id @default(uuid())
-
-  // Workspace Name
-  name String
-
-  // Foreign Key
-  organizationId String
-
-  organization Organization @relation(fields: [organizationId], references: [id])
-
-  // Workspace Members
-  members WorkspaceMember[]
-
-  // Projects
-  projects Project[]
-
-  // Meetings
-  meetings Meeting[]
-
-  // Activity Logs
-  activities Activity[]
-
-  // Created Timestamp
-  createdAt DateTime @default(now())
-}
-
-// WORKSPACE MEMBER MODEL
-model WorkspaceMember {
-  // Unique ID
-  id String @id @default(uuid())
-
-  // User foreign key
-  userId String
-
-  // Workspace foreign key
-  workspaceId String
-
-  // Permission level inside workspace
-  role Role @default(MEMBER)
-
-  // User Relationship
-  user User @relation(fields: [userId], references: [id])
-
-  // Workspace.id
-  workspace Workspace @relation(fields: [workspaceId], references: [id])
-
-  // When user joined workspace
-  joinedAt DateTime @default(now())
-
-  // Prevent duplicate membership
-  @@unique([userId, workspaceId])
-}
-
-model Task {
-  // Primary key
-  id String @id @default(uuid())
-
-  // Task title
-  title String
-
-  // Detailed explanation
-  description String?
-
-  status   TaskStatus @default(TODO)
-  position Float
-
-  // Priority level
-  priority Priority @default(MEDIUM)
-
-  projectId String
-  project   Project @relation(fields: [projectId], references: [id])
-
-  assignedToId String?
-  assignedTo   User?   @relation("AssignedTasks", fields: [assignedToId], references: [id])
-
-  // Task Creator
-  createdById String
-  createdBy   User   @relation("CreatedTasks", fields: [createdById], references: [id])
-
-  // Calendar feature
-  dueDate DateTime?
-
-  // Future comments
-  comments Comment[]
-
-  // Future attachments
-  attachments Attachment[]
-
-  createdAt DateTime @default(now())
-}
-
-model Project {
-  // Primary key
-  id String @id @default(uuid())
-
-  // Project name
-  name String
-
-  // Optional project description
-  description String?
-
-  // Project lifecycle status
-  status ProjectStatus @default(PLANNING)
-
-  // Workspace reference
-  workspaceId String
-
-  // Workspace Relation
-  workspace Workspace @relation(fields: [workspaceId], references: [id])
-
-  // Project Tasks
-  tasks Task[]
-
-  createdAt DateTime @default(now())
-}
-
-model Comment {
-  // Unique identifier
-  id String @id @default(uuid())
-
-  message String
-
-  // Task reference
-  taskId String
-
-  // User who wrote comment
-  userId String
-
-  // Task Relationship
-  task Task @relation(fields: [taskId], references: [id])
-
-  // User Relationship
-  user User @relation(fields: [userId], references: [id])
-
-  // When comment was created
-  createdAt DateTime @default(now())
-}
-
-// ATTACHMENT MODEL
-model Attachment {
-  // Primary key
-  id String @id @default(uuid())
-
-  fileName String
-  fileUrl  String
-
-  // Useful for deleting files later.
-  publicId String?
-
-  // Task reference
-  taskId String
-
-  // Task Relationship
-  task Task @relation(fields: [taskId], references: [id])
-
-  // Upload timestamp
-  uploadedAt DateTime @default(now())
-}
-
-model Meeting {
-  // Primary key
-  id String @id @default(uuid())
-
-  // Meeting title
-  title String
-
-  transcript String?
-
-  // AI generated summary
-  summary String?
-
-  // Workspace reference
-  workspaceId String
-
-  // Workspace Relationship
-  workspace Workspace @relation(fields: [workspaceId], references: [id])
-
-  createdAt DateTime @default(now())
-}
-
-// NOTIFICATION MODEL
-model Notification {
-  // Unique identifier
-  id String @id @default(uuid())
-
-  // Notification title
-  title String
-
-  // Notification message
-  message String
-
-  // Whether user has read it
-  isRead Boolean @default(false)
-
-  // User reference
-  userId String
-
-  // User Relationship
-  user User @relation(fields: [userId], references: [id])
-
-  // Created time
-  createdAt DateTime @default(now())
-}
-
-// REFRESH TOKEN MODEL
-model RefreshToken {
-  // Primary key
-  id String @id @default(uuid())
-
-  // Actual token value
-  token String @unique
-
-  // Owner of this token
-  userId String
-
-  // User Relationship
-  user User @relation(fields: [userId], references: [id])
-
-  // Token expiry date
-  expiresAt DateTime
-
-  //When session was created
-  createdAt DateTime @default(now())
-}
-
-model Account {
-  // Primary key
-  id String @id @default(uuid())
-
-  // User reference
-  userId String @unique
-
-  // Provider name
-  provider String
-
-  // ID received from provider
-  providerAccountId String
-
-  // User Relationship
-  user User @relation(fields: [userId], references: [id])
-
-  // Same provider account
-  // cannot connect twice.
-  @@unique([provider, providerAccountId])
-}
-
-// AI HISTORY MODEL
-model AIHistory {
-  // Primary key
-  id String @id @default(uuid())
-
-  // AI feature used
-  type AIType
-
-  // User prompt/input
-  input String
-
-  // AI generated response
-  output String
-
-  // User who requested AI
-  userId String
-
-  // User Relationship
-  user User @relation(fields: [userId], references: [id])
-
-  createdAt DateTime @default(now())
-}
-
-model Activity {
-  // Primary key
-  id String @id @default(uuid())
-
-  // Action performed
-  action String
-
-  // User who performed action
-  userId String
-
-  // Workspace where action happened
-  workspaceId String
-
-  // User Relationship
-  user User @relation(fields: [userId], references: [id])
-
-  // Workspace Relationship
-  workspace Workspace @relation(fields: [workspaceId], references: [id])
-
-  createdAt DateTime @default(now())
 }

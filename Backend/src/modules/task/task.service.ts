@@ -15,7 +15,9 @@ import {
 }
     from "../../utils/permission";
 import {
-    UpdateTaskInput
+    UpdateTaskInput,
+    AssignTaskInput,
+    ReorderTasksInput
 }
     from "./task.validation";
 
@@ -596,5 +598,347 @@ export async function deleteTask(
 
     });
 
+
+}
+
+
+/*
+    Assign Task
+
+    Allows OWNER, ADMIN, or task creator
+    to assign a task to a workspace member.
+*/
+
+export async function assignTask(
+
+    taskId: string,
+
+    data: AssignTaskInput,
+
+    userId: string
+
+) {
+
+
+    const task =
+
+        await prisma.task.findUnique({
+
+            where: {
+                id: taskId
+            }
+
+        });
+
+
+
+    if (!task) {
+
+        throw new Error(
+            "Task not found"
+        );
+
+    }
+
+
+
+    /*
+        Verify project access
+    */
+
+    const project =
+
+        await requireProjectAccess(
+
+            task.projectId,
+
+            userId
+
+        );
+
+
+
+    /*
+        Check user has permission
+        to assign tasks (OWNER/ADMIN or creator)
+    */
+
+    const membership =
+
+        await prisma.workspaceMember.findUnique({
+
+            where: {
+
+                userId_workspaceId: {
+
+                    userId,
+
+                    workspaceId:
+                        project.workspaceId
+
+                }
+
+            }
+
+        });
+
+
+
+    const canAssign =
+
+        membership?.role === "OWNER" ||
+
+        membership?.role === "ADMIN" ||
+
+        task.createdById === userId;
+
+
+
+    if (!canAssign) {
+
+        throw new Error(
+            "You don't have permission to assign this task"
+        );
+
+    }
+
+
+
+    /*
+        Verify the assignee is a workspace member
+    */
+
+    const assigneeMembership =
+
+        await prisma.workspaceMember.findUnique({
+
+            where: {
+
+                userId_workspaceId: {
+
+                    userId: data.assignedToId,
+
+                    workspaceId:
+                        project.workspaceId
+
+                }
+
+            }
+
+        });
+
+
+
+    if (!assigneeMembership) {
+
+        throw new Error(
+            "Assignee is not a member of this workspace"
+        );
+
+    }
+
+
+
+    const updatedTask =
+
+        await prisma.task.update({
+
+            where: {
+                id: taskId
+            },
+
+            data: {
+
+                assignedToId: data.assignedToId
+
+            }
+
+        });
+
+
+
+    return updatedTask;
+
+}
+
+/*
+    =======================================================
+    Reorder Tasks
+    =======================================================
+
+    This service updates the position of every task
+    inside a project.
+
+    The frontend sends the ordered list of task IDs.
+
+    Example:
+
+    taskIds =
+
+    [
+        Task-C,
+        Task-A,
+        Task-B
+    ]
+
+    Backend converts this into
+
+    Task-C -> position = 1
+
+    Task-A -> position = 2
+
+    Task-B -> position = 3
+
+    Why transaction?
+
+    Suppose updating five tasks.
+
+    If task 4 fails,
+
+    task 1,2,3 should NOT remain updated.
+
+    A transaction guarantees
+
+    ALL succeed
+
+    OR
+
+    ALL fail.
+*/
+
+export async function reorderTasks(
+
+    projectId: string,
+
+    data: ReorderTasksInput,
+
+    userId: string
+
+) {
+
+    /*
+        Verify the logged-in user
+        has access to the project.
+    */
+
+    const project =
+
+        await requireProjectAccess(
+
+            projectId,
+
+            userId
+
+        );
+
+
+
+    /*
+        Verify every task belongs
+        to the given project.
+
+        Prevents users from sending
+        task IDs belonging to another project.
+    */
+
+    const tasks =
+
+        await prisma.task.findMany({
+
+            where: {
+
+                id: {
+
+                    in: data.taskIds
+
+                }
+
+            }
+
+        });
+
+
+
+    /*
+        Safety check.
+    */
+
+    if (
+
+        tasks.some(
+
+            task =>
+
+                task.projectId !== project.id
+
+        )
+
+    ) {
+
+        throw new Error(
+
+            "One or more tasks do not belong to this project."
+
+        );
+
+    }
+
+
+
+    /*
+        Update every task position.
+
+        Prisma transaction ensures
+        database consistency.
+    */
+
+    await prisma.$transaction(
+
+        data.taskIds.map(
+
+            (
+
+                taskId,
+
+                index
+
+            ) =>
+
+                prisma.task.update({
+
+                    where: {
+
+                        id: taskId
+
+                    },
+
+                    data: {
+
+                        /*
+                            Position starts from 1.
+
+                            Easier to read
+                            than starting from 0.
+                        */
+
+                        position:
+
+                            index + 1
+
+                    }
+
+                })
+
+        )
+
+    );
+
+
+
+    return {
+
+        success: true
+
+    };
 
 }
