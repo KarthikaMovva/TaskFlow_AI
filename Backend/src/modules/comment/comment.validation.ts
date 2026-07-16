@@ -10,7 +10,8 @@ export const createCommentSchema = z.object({
         .string()
         .trim()
         .min(1, "Comment cannot be empty")
-        .max(1000, "Comment is too long")
+        .max(1000, "Comment is too long"),
+    taskId: z.string()
 
 });
 

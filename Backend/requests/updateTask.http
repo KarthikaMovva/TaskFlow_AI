@@ -1,14 +1,10 @@
 ### Update Task
 
-PATCH http://localhost:5000/api/tasks/2ca9529c-19be-45c1-9ef1-342b597b7de4
+PATCH http://localhost:5000/api/tasks/d0f185a4-700d-40ee-b722-ba133f3e1ebb
 Authorization: Bearer token
 Content-Type: application/json
 
 
 {
-    "status":"IN_PROGRESS",
-
-    "priority":"URGENT",
-
-    "description":"Working on authentication flow"
+    "description": "Updated implementation details"
 }

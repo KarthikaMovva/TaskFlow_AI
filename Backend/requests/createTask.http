@@ -6,9 +6,9 @@ Content-Type: application/json
 
 
 {
-    "title":"Implement JWT Authentication",
+    "title":"Add Notifications",
 
-    "description":"Intregate with FE",
+    "description":"Implement in all modules",
 
     "projectId":"ef3a8905-dcb6-470a-a349-ae7ee99db659",
 
