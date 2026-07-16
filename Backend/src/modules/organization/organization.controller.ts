@@ -165,7 +165,7 @@ export async function getOrganization(
         const organization =
             await getOrganizationById(
 
-                req.params.organizationId,
+                req.params.organizationId as string,
 
                 req.user!.id
 
@@ -243,7 +243,7 @@ export async function getMembers(
         const members =
             await getOrganizationMembers(
 
-                req.params.organizationId,
+                req.params.organizationId as string,
 
                 req.user!.id
 
@@ -308,11 +308,11 @@ export async function changeMemberRole(
         const member =
             await updateMemberRole(
 
-                req.params.organizationId,
+                req.params.organizationId as string,
 
                 req.user!.id,
 
-                req.params.memberId,
+                req.params.memberId as string,
 
                 data.role
 
@@ -355,9 +355,9 @@ export async function deleteMember(
     try {
 
         await removeMember(
-            req.params.organizationId,
+            req.params.organizationId as string,
             req.user!.id,
-            req.params.memberId
+            req.params.memberId as string
         );
 
         res.json({

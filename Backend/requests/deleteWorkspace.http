@@ -1,4 +1,4 @@
 ### Delete Workspace
 
 DELETE http://localhost:5000/api/workspaces/474830c4-628f-419f-ac66-da711e8fe3f8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjZkN2IzOS1mMThhLTQ5OWMtYjJlOS03NDE0ZjMzODcxM2EiLCJpYXQiOjE3ODQwMjg3NzIsImV4cCI6MTc4NDAyOTY3Mn0.iXfRWs1b3KXE7IL8MDjQDtFB8QmX_DPz6fKKqFO5dxY
+Authorization: Bearer token

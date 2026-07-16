@@ -18,7 +18,9 @@ import {
     getProjectTasksController,
     getTaskDetailsController,
     updateTaskController,
-    deleteTaskController
+    deleteTaskController,
+    assignTaskController,
+    reorderTasksController
 
 }
     from "./task.controller";
@@ -100,6 +102,44 @@ router.delete(
     protectRoute,
 
     deleteTaskController
+
+);
+
+/*
+    Assign Task
+
+    PATCH /api/tasks/:taskId/assign
+*/
+
+router.patch(
+
+    "/:taskId/assign",
+
+    protectRoute,
+
+    assignTaskController
+
+);
+
+/*
+    =======================================================
+    Reorder Tasks
+
+    PATCH /api/tasks/project/:projectId/reorder
+
+    Used by Kanban drag-and-drop.
+
+    Updates the position of every task
+    inside the project.
+*/
+
+router.patch(
+
+    "/project/:projectId/reorder",
+
+    protectRoute,
+
+    reorderTasksController
 
 );
 

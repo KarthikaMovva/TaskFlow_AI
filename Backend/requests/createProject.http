@@ -17,7 +17,7 @@ Content-Type: application/json
 
 
 POST http://localhost:5000/api/projects
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjZkN2IzOS1mMThhLTQ5OWMtYjJlOS03NDE0ZjMzODcxM2EiLCJpYXQiOjE3ODQwNTMzMzYsImV4cCI6MTc4NDA1NDIzNn0.gvVZOnAkyHr_ei7KtEUNiZsC9jOIHjjySZ0l3X7CHm8
+Authorization: Bearer token
 Content-Type: application/json
 
 

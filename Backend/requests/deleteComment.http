@@ -1,0 +1,6 @@
+### Delete Comment
+
+DELETE http://localhost:5000/api/comments/19bf1ab9-2efe-4ef2-95c9-b4ad5338c2af
+Authorization: Bearer token
+
+## eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMmYyOGQxZi0wZjcxLTQwNzYtOTNhNC04MjJlNmEwNGMxMTYiLCJpYXQiOjE3ODQxMDM1MDAsImV4cCI6MTc4NDEwNDQwMH0.4FR1yCtPpebvFPHWjBiCp6QlMtAJnIkWIr183zpYq3s

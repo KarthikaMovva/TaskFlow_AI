@@ -1,7 +1,7 @@
 ### Update Workspace
 
 PATCH http://localhost:5000/api/workspaces/474830c4-628f-419f-ac66-da711e8fe3f8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyY2NjODAwZi05NDAwLTQ3YmItODhkNi05YzQwZDcxZWM5MTciLCJpYXQiOjE3ODQwMjgzMjUsImV4cCI6MTc4NDAyOTIyNX0.XHD04Xw54pxz7LEoUBADvOxXi6yKiay7b_icUVQf2EY
+Authorization: Bearer token
 Content-Type: application/json
 
 

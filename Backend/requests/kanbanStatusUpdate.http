@@ -1,0 +1,10 @@
+### Move Task to IN_PROGRESS
+
+PATCH http://localhost:5000/api/tasks/f125fc6c-78ae-41cd-b943-4a9ef8031b3e
+Authorization: Bearer token
+Content-Type: application/json
+
+
+{
+    "status":"IN_PROGRESS"
+}

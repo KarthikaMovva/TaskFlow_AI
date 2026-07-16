@@ -8,29 +8,22 @@ import {
 import {
     createTask,
     getProjectTasks,
-    getTaskDetails
+    getTaskDetails,
+    updateTask,
+    deleteTask,
+    assignTask,
+    reorderTasks
 }
     from "./task.service";
 
 
 import {
-    createTaskSchema
+    createTaskSchema,
+    updateTaskSchema,
+    assignTaskSchema,
+    reorderTasksSchema
 }
     from "./task.validation";
-import {
-    updateTask
-}
-    from "./task.service";
-
-
-import {
-    updateTaskSchema
-}
-    from "./task.validation";
-import {
-    deleteTask
-}
-    from "./task.service";
 
 
 /*
@@ -172,7 +165,7 @@ export async function getProjectTasksController(
 
             await getProjectTasks(
 
-                req.params.projectId,
+                req.params.projectId as string,
 
                 req.user!.id
 
@@ -232,7 +225,7 @@ export async function getTaskDetailsController(
 
             await getTaskDetails(
 
-                req.params.taskId,
+                req.params.taskId as string,
 
                 req.user!.id
 
@@ -298,7 +291,7 @@ export async function updateTaskController(
 
             await updateTask(
 
-                req.params.taskId,
+                req.params.taskId as string,
 
                 data,
 
@@ -359,7 +352,7 @@ export async function deleteTaskController(
 
         await deleteTask(
 
-            req.params.taskId,
+            req.params.taskId as string,
 
             req.user!.id
 
@@ -393,6 +386,181 @@ export async function deleteTaskController(
                     ? error.message
 
                     : "Failed"
+
+        });
+
+    }
+
+}
+
+/*
+    Assign Task Controller
+*/
+
+export async function assignTaskController(
+
+    req: AuthRequest,
+
+    res: Response
+
+) {
+
+    try {
+
+
+        const data =
+
+            assignTaskSchema.parse(
+
+                req.body
+
+            );
+
+
+
+        const task =
+
+            await assignTask(
+
+                req.params.taskId as string,
+
+                data,
+
+                req.user!.id
+
+            );
+
+
+
+        res.json({
+
+            success: true,
+
+            message:
+                "Task assigned successfully",
+
+            task
+
+        });
+
+
+    }
+
+    catch (error) {
+
+        res.status(400).json({
+
+            success: false,
+
+            message:
+
+                error instanceof Error
+
+                    ? error.message
+
+                    : "Failed"
+
+        });
+
+    }
+
+}
+
+/*
+    =======================================================
+    Reorder Tasks Controller
+    =======================================================
+
+    Responsibilities
+
+    1. Validate request body.
+    2. Read projectId.
+    3. Call service.
+    4. Return response.
+
+    This endpoint is used by the
+    Kanban drag-and-drop frontend.
+
+    The frontend sends
+
+    {
+        taskIds:[
+            "...",
+            "...",
+            "..."
+        ]
+    }
+
+    The order inside taskIds
+    becomes the order of tasks
+    inside the database.
+*/
+
+export async function reorderTasksController(
+
+    req: AuthRequest,
+
+    res: Response
+
+) {
+
+    try {
+
+        /*
+            Validate request body.
+        */
+
+        const data =
+
+            reorderTasksSchema.parse(
+
+                req.body
+
+            );
+
+
+
+        /*
+            Call service.
+        */
+
+        await reorderTasks(
+
+            req.params.projectId,
+
+            data,
+
+            req.user!.id
+
+        );
+
+
+
+        return res.status(200).json({
+
+            success: true,
+
+            message:
+
+                "Tasks reordered successfully"
+
+        });
+
+    }
+
+    catch (error) {
+
+        return res.status(400).json({
+
+            success: false,
+
+            message:
+
+                error instanceof Error
+
+                    ? error.message
+
+                    : "Failed to reorder tasks"
 
         });
 

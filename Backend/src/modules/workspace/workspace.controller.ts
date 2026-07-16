@@ -159,7 +159,7 @@ export async function getWorkspaces(
         const workspaces =
             await getOrganizationWorkspaces(
 
-                req.params.organizationId,
+                req.params.organizationId as string,
 
                 req.user!.id
 
@@ -210,7 +210,7 @@ export async function getWorkspace(
         const workspace =
             await getWorkspaceById(
 
-                req.params.workspaceId,
+                req.params.workspaceId as string,
 
                 req.user!.id
 
@@ -270,7 +270,7 @@ export async function updateWorkspaceController(
         const workspace =
             await updateWorkspace(
 
-                req.params.workspaceId,
+                req.params.workspaceId as string,
 
                 req.user!.id,
 
@@ -326,7 +326,7 @@ export async function deleteWorkspaceController(
 
         await deleteWorkspace(
 
-            req.params.workspaceId,
+            req.params.workspaceId as string,
 
             req.user!.id
 

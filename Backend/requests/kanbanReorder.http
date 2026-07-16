@@ -1,0 +1,15 @@
+### Reorder Tasks
+
+PATCH http://localhost:5000/api/tasks/project/ef3a8905-dcb6-470a-a349-ae7ee99db659/reorder
+Content-Type: application/json
+Authorization: Bearer token
+
+{
+    "taskIds":[
+
+        "e068fe97-c248-4ec9-91cd-146ea99a5689",
+
+        "d0f185a4-700d-40ee-b722-ba133f3e1ebb"
+
+    ]
+}

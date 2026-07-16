@@ -1,0 +1,4 @@
+### Get Kanban Board
+
+GET http://localhost:5000/api/kanban/ef3a8905-dcb6-470a-a349-ae7ee99db659
+Authorization: Bearer token
