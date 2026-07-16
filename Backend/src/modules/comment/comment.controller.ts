@@ -40,19 +40,28 @@ export async function createCommentController(
 
         const data =
 
-            createCommentSchema.parse(
+            createCommentSchema.parse({
 
-                req.body
+                ...req.body,
 
-            );
+                taskId:
+
+                    req.params.taskId
+
+            });
 
         const comment =
 
             await createComment(
 
-                req.params.taskId as string,
+                {
+                    ...data,
 
-                data,
+                    taskId:
+
+                        req.params.taskId as string
+
+                },
 
                 req.user!.id
 

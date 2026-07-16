@@ -2,6 +2,8 @@ import prisma from "../../config/prisma";
 import { requireProjectAccess } from "../../utils/permission";
 import { CreateCommentInput } from "./comment.validation";
 import { UpdateCommentInput } from "./comment.validation";
+import { createActivity }
+    from "../activity/activity.service";
 
 /*
     Create Comment
@@ -9,9 +11,10 @@ import { UpdateCommentInput } from "./comment.validation";
 
 export async function createComment(
 
-    taskId: string,
-
-    data: CreateCommentInput,
+    data: {
+        message: string;
+        taskId: string;
+    },
 
     userId: string
 
@@ -24,7 +27,15 @@ export async function createComment(
     const task = await prisma.task.findUnique({
 
         where: {
-            id: taskId
+
+            id: data.taskId
+
+        },
+
+        include: {
+
+            project: true
+
         }
 
     });
@@ -57,7 +68,7 @@ export async function createComment(
 
             message: data.message,
 
-            taskId,
+            taskId: data.taskId,
 
             userId
 
@@ -65,15 +76,11 @@ export async function createComment(
 
         include: {
 
-            user: {
+            task: {
 
-                select: {
+                include: {
 
-                    id: true,
-
-                    name: true,
-
-                    avatar: true
+                    project: true
 
                 }
 
@@ -82,6 +89,43 @@ export async function createComment(
         }
 
     });
+
+    /*
+    Create activity after
+    comment is successfully saved.
+*/
+
+    await createActivity({
+
+        action:
+
+            "COMMENT_CREATED",
+
+
+        description:
+
+            `Added a comment on task "${task.title}"`,
+
+
+        entityType:
+
+            "COMMENT",
+
+
+        entityId:
+
+            comment.id,
+
+
+        userId,
+
+
+        workspaceId:
+
+            task.project.workspaceId
+
+    });
+
 
     return comment;
 

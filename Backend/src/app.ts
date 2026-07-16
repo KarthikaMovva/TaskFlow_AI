@@ -44,6 +44,8 @@ import commentRoutes
     from "./modules/comment/comment.routes";
 import KanbanRoutes
     from "./modules/kanban/kanban.routes";
+import activityRoutes
+    from "./modules/activity/activity.routes";
 
 
 /*
@@ -176,6 +178,10 @@ app.use(
 app.use(
     "/api/kanban",
     KanbanRoutes
+);
+app.use(
+    "/api/activity",
+    activityRoutes
 );
 
 app.get(

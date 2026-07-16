@@ -20,6 +20,7 @@ import {
     ReorderTasksInput
 }
     from "./task.validation";
+import { createActivity } from "../activity/activity.service";
 
 /*
     Create Task
@@ -119,7 +120,22 @@ export async function createTask(
         });
 
 
+    await createActivity({
 
+        action: "TASK_CREATED",
+
+        description:
+            `Created task "${task.title}"`,
+
+        entityType: "TASK",
+
+        entityId: task.id,
+
+        userId,
+
+        workspaceId: project.workspaceId
+
+    });
     return task;
 
 }
@@ -446,23 +462,23 @@ export async function updateTask(
         );
 
     }
-
-
+    /*
+        Update the task.
+    */
 
     const updatedTask =
 
         await prisma.task.update({
 
             where: {
-                id: taskId
-            },
 
+                id: taskId
+
+            },
 
             data: {
 
-
                 ...data,
-
 
                 dueDate:
 
@@ -476,7 +492,148 @@ export async function updateTask(
 
         });
 
+    /*
+        ===================================================
+        Activity Logging
+        ===================================================
+    
+        Compare the original task with
+        the updated task and create
+        meaningful activity logs.
+    */
 
+    /*
+        Status Changed
+    */
+
+    if (
+
+        data.status &&
+
+        task.status !== updatedTask.status
+
+    ) {
+
+        await createActivity({
+
+            action: "TASK_STATUS_CHANGED",
+
+            description:
+
+                `Changed status of "${task.title}" from ${task.status} to ${updatedTask.status}`,
+
+            entityType: "TASK",
+
+            entityId: task.id,
+
+            userId,
+
+            workspaceId: project.workspaceId
+
+        });
+
+    }
+
+    /*
+        Priority Changed
+    */
+
+    if (
+
+        data.priority &&
+
+        task.priority !== updatedTask.priority
+
+    ) {
+
+        await createActivity({
+
+            action: "TASK_PRIORITY_CHANGED",
+
+            description:
+
+                `Changed priority of "${task.title}" from ${task.priority} to ${updatedTask.priority}`,
+
+            entityType: "TASK",
+
+            entityId: task.id,
+
+            userId,
+
+            workspaceId: project.workspaceId
+
+        });
+
+    }
+
+    /*
+        Title Changed
+    */
+
+    if (
+
+        data.title &&
+
+        task.title !== updatedTask.title
+
+    ) {
+
+        await createActivity({
+
+            action: "TASK_RENAMED",
+
+            description:
+
+                `Renamed task from "${task.title}" to "${updatedTask.title}"`,
+
+            entityType: "TASK",
+
+            entityId: task.id,
+
+            userId,
+
+            workspaceId: project.workspaceId
+
+        });
+
+    }
+
+    /*
+        Generic update.
+    
+        If no specific activity was logged,
+        create a generic update activity.
+    */
+
+    if (
+
+        !data.status &&
+
+        !data.priority &&
+
+        !data.title
+
+    ) {
+
+        await createActivity({
+
+            action: "TASK_UPDATED",
+
+            description:
+
+                `Updated task "${updatedTask.title}"`,
+
+            entityType: "TASK",
+
+            entityId: task.id,
+
+            userId,
+
+            workspaceId: project.workspaceId
+
+        });
+
+    }
 
     return updatedTask;
 
@@ -590,10 +747,61 @@ export async function deleteTask(
 
 
 
+    /*
+        Create activity BEFORE deleting.
+    
+        After deletion we cannot access:
+    
+        - task.title
+        - task.projectId
+        - task.id
+    
+        because the record no longer exists.
+    */
+
+    await createActivity({
+
+        action:
+
+            "TASK_DELETED",
+
+
+        description:
+
+            `Deleted task "${task.title}"`,
+
+
+        entityType:
+
+            "TASK",
+
+
+        entityId:
+
+            task.id,
+
+
+        userId,
+
+
+        workspaceId:
+
+            project.workspaceId
+
+    });
+
+
+
+    /*
+        Now permanently delete the task.
+    */
+
     await prisma.task.delete({
 
         where: {
+
             id: taskId
+
         }
 
     });
@@ -739,21 +947,101 @@ export async function assignTask(
 
 
 
+    /*
+        Update task assignment
+    */
+
     const updatedTask =
 
         await prisma.task.update({
 
             where: {
+
                 id: taskId
+
             },
 
             data: {
 
-                assignedToId: data.assignedToId
+                assignedToId:
+
+                    data.assignedToId
 
             }
 
         });
+
+
+
+    /*
+        Fetch assignee details.
+    
+        We need the user's name
+        for a meaningful activity message.
+    
+        Example:
+    
+        Assigned "Backend API"
+        to Karthika
+    
+    */
+
+    const assignee =
+
+        await prisma.user.findUnique({
+
+            where: {
+
+                id:
+
+                    data.assignedToId
+
+            },
+
+            select: {
+
+                name: true
+
+            }
+
+        });
+
+
+
+    /*
+        Create activity log.
+    */
+
+    await createActivity({
+
+        action:
+
+            "TASK_ASSIGNED",
+
+
+        description:
+
+            `Assigned task "${task.title}" to ${assignee?.name}`,
+
+
+        entityType:
+
+            "TASK",
+
+
+        entityId:
+
+            task.id,
+
+
+        userId,
+
+
+        workspaceId:
+
+            project.workspaceId
+
+    });
 
 
 

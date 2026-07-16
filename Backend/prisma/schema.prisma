@@ -183,6 +183,9 @@ model AIHistory {
 model Activity {
   id          String    @id @default(uuid())
   action      String
+  description String?
+  entityId    String?
+  entityType  String?
   userId      String
   workspaceId String
   createdAt   DateTime  @default(now())
@@ -228,4 +231,12 @@ enum InvitationStatus {
   ACCEPTED
   REJECTED
   EXPIRED
+}
+
+enum ActivityEntityType {
+  TASK
+  PROJECT
+  COMMENT
+  WORKSPACE
+  ORGANIZATION
 }
