@@ -8,3 +8,16 @@ Content-Type: application/json
 {
     "assignedToId":"12f28d1f-0f71-4076-93a4-822e6a04c116"
 }
+
+### Assign task notification( token - userA(the owner or who is assigning) assignedToId - userB(the developer who is assigned to task and in api task id should be provided)
+
+
+
+PATCH http://localhost:5000/api/tasks/dd68b7fb-4102-49d0-b311-1e847acc8604/assign
+Authorization: Bearer token
+Content-Type: application/json
+
+
+{
+    "assignedToId":"12f28d1f-0f71-4076-93a4-822e6a04c116"
+}

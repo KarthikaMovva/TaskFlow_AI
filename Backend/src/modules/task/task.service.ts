@@ -833,7 +833,9 @@ export async function assignTask(
         await prisma.task.findUnique({
 
             where: {
+
                 id: taskId
+
             }
 
         });
@@ -867,8 +869,7 @@ export async function assignTask(
 
 
     /*
-        Check user has permission
-        to assign tasks (OWNER/ADMIN or creator)
+        Check permission
     */
 
     const membership =
@@ -913,7 +914,8 @@ export async function assignTask(
 
 
     /*
-        Verify the assignee is a workspace member
+        Verify assignee belongs
+        to workspace
     */
 
     const assigneeMembership =
@@ -924,7 +926,8 @@ export async function assignTask(
 
                 userId_workspaceId: {
 
-                    userId: data.assignedToId,
+                    userId:
+                        data.assignedToId,
 
                     workspaceId:
                         project.workspaceId
@@ -964,7 +967,6 @@ export async function assignTask(
             data: {
 
                 assignedToId:
-
                     data.assignedToId
 
             }
@@ -974,16 +976,7 @@ export async function assignTask(
 
 
     /*
-        Fetch assignee details.
-    
-        We need the user's name
-        for a meaningful activity message.
-    
-        Example:
-    
-        Assigned "Backend API"
-        to Karthika
-    
+        Get assignee details
     */
 
     const assignee =
@@ -993,7 +986,6 @@ export async function assignTask(
             where: {
 
                 id:
-
                     data.assignedToId
 
             },
@@ -1009,7 +1001,15 @@ export async function assignTask(
 
 
     /*
-        Create activity log.
+        Activity + Notification
+
+        This will:
+
+        1. Create activity log
+
+        2. Create notification
+           for assigned user
+
     */
 
     await createActivity({
@@ -1039,7 +1039,12 @@ export async function assignTask(
 
         workspaceId:
 
-            project.workspaceId
+            project.workspaceId,
+
+
+        notifyUserId:
+
+            data.assignedToId
 
     });
 
@@ -1124,7 +1129,7 @@ export async function reorderTasks(
     /*
         Verify every task belongs
         to the given project.
-
+ 
         Prevents users from sending
         task IDs belonging to another project.
     */
@@ -1175,7 +1180,7 @@ export async function reorderTasks(
 
     /*
         Update every task position.
-
+ 
         Prisma transaction ensures
         database consistency.
     */
@@ -1204,7 +1209,7 @@ export async function reorderTasks(
 
                         /*
                             Position starts from 1.
-
+ 
                             Easier to read
                             than starting from 0.
                         */

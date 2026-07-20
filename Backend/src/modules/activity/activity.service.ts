@@ -1,48 +1,115 @@
 import prisma from "../../config/prisma";
 
+import {
+    createNotification
+}
+    from "../notification/notification.service";
+
 
 /*
     =======================================================
     Activity Service
-    =======================================================
 
-    Responsibilities:
+    Central event handler.
 
-    1. Create activity records
+    Every important action in the system
+    should come here.
 
-    Used by:
-        Task
-        Comment
-        Project
+    Examples:
 
+    TASK_CREATED
+    TASK_ASSIGNED
+    COMMENT_CREATED
+    TASK_DELETED
 
-    2. Fetch activity history
+    This service will:
 
-    Used by:
-        Dashboard
-        Timeline
+    1. Save activity history
+    2. Create notification if required
+
 */
 
 
 interface CreateActivityInput {
 
 
+    /*
+        Type of action
+
+        Example:
+
+        TASK_CREATED
+        COMMENT_CREATED
+
+    */
+
     action: string;
 
+
+
+    /*
+        Human readable message
+
+    */
 
     description?: string;
 
 
+
+    /*
+        Related entity
+
+        Example:
+
+        TASK
+        COMMENT
+
+    */
+
     entityType?: string;
 
+
+
+    /*
+        Related entity id
+
+    */
 
     entityId?: string;
 
 
+
+    /*
+        User who performed action
+
+    */
+
     userId: string;
 
 
+
+    /*
+        Workspace where action happened
+
+    */
+
     workspaceId: string;
+
+
+
+    /*
+        Optional notification receiver
+
+        Example:
+
+        Task assigned to Rahul
+
+        notifyUserId = Rahul
+
+    */
+
+    notifyUserId?: string;
+
 
 }
 
@@ -51,15 +118,11 @@ interface CreateActivityInput {
 /*
     =======================================================
     CREATE ACTIVITY
-    =======================================================
 
-    Example:
+    Creates activity log.
 
-    TASK_CREATED
-
-    COMMENT_CREATED
-
-    TASK_ASSIGNED
+    If notifyUserId exists,
+    also creates notification.
 
 */
 
@@ -71,75 +134,37 @@ export async function createActivity(
 ) {
 
 
-    return prisma.activity.create({
-
-        data: {
-
-            action: data.action,
-
-            description: data.description,
-
-            entityType: data.entityType,
-
-            entityId: data.entityId,
-
-            userId: data.userId,
-
-            workspaceId: data.workspaceId
-
-        }
-
-    });
-
-
-}
-
-
-
-/*
-    =======================================================
-    GET WORKSPACE ACTIVITIES
-    =======================================================
-
-    Fetch recent activities
-    belonging to a workspace.
-
-*/
-
-export async function getWorkspaceActivities(
-
-    workspaceId: string,
-
-    userId: string
-
-) {
-
 
     /*
-        Check workspace membership.
-
-        Security:
-
-        User should only see
-        activities of workspaces
-        they belong to.
+        1.
+        Save activity history
 
     */
 
+    const activity =
 
-    const membership =
+        await prisma.activity.create({
 
-        await prisma.workspaceMember.findUnique({
+            data: {
 
-            where: {
 
-                userId_workspaceId: {
+                action: data.action,
 
-                    userId,
 
-                    workspaceId
+                description: data.description,
 
-                }
+
+                entityType: data.entityType,
+
+
+                entityId: data.entityId,
+
+
+                userId: data.userId,
+
+
+                workspaceId: data.workspaceId
+
 
             }
 
@@ -147,70 +172,50 @@ export async function getWorkspaceActivities(
 
 
 
-    if (!membership) {
 
-        throw new Error(
 
-            "You don't have access to this workspace"
+    /*
+        2.
+        Create notification if required
 
-        );
+
+        Example:
+
+        Task assigned
+
+        User A assigns task to User B
+
+        notifyUserId = User B
+
+    */
+
+
+    if (data.notifyUserId) {
+
+
+        await createNotification({
+
+            title: data.action,
+
+
+            message:
+
+                data.description ??
+
+                "New activity",
+
+
+            userId: data.notifyUserId
+
+        });
+
 
     }
 
 
 
-    /*
-        Fetch activities.
 
-        Include user details
-        for frontend display.
+    return activity;
 
-    */
-
-
-    const activities =
-
-        await prisma.activity.findMany({
-
-            where: {
-
-                workspaceId
-
-            },
-
-
-            include: {
-
-                user: {
-
-                    select: {
-
-                        id: true,
-
-                        name: true,
-
-                        avatar: true
-
-                    }
-
-                }
-
-            },
-
-
-            orderBy: {
-
-                createdAt: "desc"
-
-            },
-
-
-            take: 50
-
-        });
-
-
-
-    return activities;
 
 }

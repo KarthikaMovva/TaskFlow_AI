@@ -24,6 +24,7 @@ export async function createComment(
         Find task
     */
 
+
     const task = await prisma.task.findUnique({
 
         where: {
@@ -39,6 +40,7 @@ export async function createComment(
         }
 
     });
+    console.log("Task:", task);
 
     if (!task) {
 
@@ -91,40 +93,76 @@ export async function createComment(
     });
 
     /*
-    Create activity after
-    comment is successfully saved.
-*/
+        Create activity + notifications.
+    
+        Notify:
+        - Task creator
+        - Assigned user
+    
+        Do NOT notify the user
+        who created the comment.
+    */
 
-    await createActivity({
+    const receivers = [
 
-        action:
+        task.createdById,
 
-            "COMMENT_CREATED",
+        task.assignedToId
 
+    ];
 
-        description:
+    /*
+        Remove duplicate IDs.
+    
+        Example:
+    
+        Creator and assignee
+        are the same user.
+    */
 
-            `Added a comment on task "${task.title}"`,
+    const uniqueReceivers = [...new Set(receivers)];
+    console.log("Receivers:", uniqueReceivers);
 
+    for (const receiverId of uniqueReceivers) {
 
-        entityType:
+        /*
+            Skip invalid values
+            and don't notify yourself.
+        */
 
-            "COMMENT",
+        if (
 
+            !receiverId ||
 
-        entityId:
+            receiverId === userId
 
-            comment.id,
+        ) {
 
+            continue;
 
-        userId,
+        }
+        console.log("Sending notification to:", receiverId);
+        await createActivity({
 
+            action: "COMMENT_CREATED",
 
-        workspaceId:
+            description:
 
-            task.project.workspaceId
+                `New comment on task "${task.title}"`,
 
-    });
+            entityType: "COMMENT",
+
+            entityId: comment.id,
+
+            userId,
+
+            workspaceId: task.project.workspaceId,
+
+            notifyUserId: receiverId
+
+        });
+
+    }
 
 
     return comment;

@@ -1,9 +1,9 @@
 ### Create Comment
 
-POST http://localhost:5000/api/comments/tasks/ba840cf7-3e6a-41fe-a35d-aa539609cc65/comments
+POST http://localhost:5000/api/comments/tasks/dd68b7fb-4102-49d0-b311-1e847acc8604/comments
 Authorization: Bearer token
 Content-Type: application/json
 
 {
-    "message": "comment is added"
+    "message": "test unread"
 }
