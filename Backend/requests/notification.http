@@ -1,0 +1,31 @@
+### Get Notifications
+
+GET http://localhost:5000/api/notifications
+Authorization: Bearer token
+
+
+### Mark Notification Read
+
+PATCH http://localhost:5000/api/notifications/6efde899-8916-4bfe-b907-c5ac662bd816/read
+Authorization: Bearer token
+
+#### Mark All Notifications Read
+
+PATCH http://localhost:5000/api/notifications/read-all
+Authorization: Bearer token
+
+#### Get Unread notifications count
+
+GET http://localhost:5000/api/notifications/unread-count
+Authorization: Bearer token
+
+#### Mark all notifications as read
+
+PATCH http://localhost:5000/api/notifications/read-all
+Authorization: Bearer token
+
+### Delete a notification
+
+
+DELETE  http://localhost:5000/api/notifications/5d2960d9-dbe1-49bc-a9aa-830570cba74e
+Authorization: Bearer token

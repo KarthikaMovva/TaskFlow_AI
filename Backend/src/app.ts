@@ -46,6 +46,8 @@ import KanbanRoutes
     from "./modules/kanban/kanban.routes";
 import activityRoutes
     from "./modules/activity/activity.routes";
+import notificationRoutes
+    from "./modules/notification/notification.routes";
 
 
 /*
@@ -182,6 +184,10 @@ app.use(
 app.use(
     "/api/activity",
     activityRoutes
+);
+app.use(
+    "/api/notifications",
+    notificationRoutes
 );
 
 app.get(
