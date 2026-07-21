@@ -24,22 +24,6 @@ import {
 const router = Router();
 
 
-
-/*
-    =======================================================
-    Workspace Activity Feed
-
-    GET
-
-    /api/activity/workspace/:workspaceId
-
-    Example:
-
-    /api/activity/workspace/abc-123
-
-*/
-
-
 router.get(
 
     "/workspace/:workspaceId",

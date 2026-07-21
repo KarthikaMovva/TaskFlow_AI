@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
     "email":"harsha@gmail.com",
-    "password":"xyz"
+    "password":"password123"
 }
 
 ### Login User 2
@@ -24,4 +24,15 @@ Content-Type: application/json
 {
     "email": "Aruna@gmail.com",
     "password": "xyz"
+}
+
+
+### Login user 4
+
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "laasya@gmail.com",
+    "password": "password123"
 }

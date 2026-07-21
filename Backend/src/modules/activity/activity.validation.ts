@@ -1,33 +1,7 @@
 import { z } from "zod";
 
 
-/*
-    =======================================================
-    Activity Validation Schema
-    =======================================================
-
-    Validates incoming activity requests.
-
-    Currently used for:
-
-    GET workspace activity
-
-
-    Future expansion:
-
-    - pagination
-    - date filtering
-    - action filtering
-
-*/
-
-
-/*
-    Validate workspace id
-*/
-
 export const workspaceActivitySchema = z.object({
-
     workspaceId:
 
         z
@@ -40,7 +14,6 @@ export const workspaceActivitySchema = z.object({
 
 
 export type WorkspaceActivityInput =
-
     z.infer<
         typeof workspaceActivitySchema
     >;
