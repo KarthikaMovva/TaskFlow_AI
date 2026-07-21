@@ -1,32 +1,3 @@
-/*
-    Authentication Middleware
-
-    Purpose:
-    ----------
-    Protect private routes.
-
-    Responsibilities:
-
-    1. Read JWT token
-    2. Verify token validity
-    3. Identify user
-    4. Attach user information
-       to request object
-
-
-    Example:
-
-    GET /api/projects
-
-    Without token:
-         Unauthorized
-
-
-    With valid token:
-        Continue
-*/
-
-
 import {
     Request,
     Response,
@@ -80,19 +51,6 @@ export async function protectRoute(
 
     try {
 
-
-        /*
-            Authorization header format:
-
-            Bearer token_here
-
-            Example:
-
-            Authorization:
-            Bearer eyJhbGc...
-        */
-
-
         const authHeader =
             req.headers.authorization;
 
@@ -111,20 +69,6 @@ export async function protectRoute(
                 });
 
         }
-
-
-
-        /*
-            Extract token.
-
-            Splitting:
-
-            Bearer abc123
-
-            becomes:
-
-            abc123
-        */
 
         const token =
             authHeader.split(" ")[1];
@@ -145,15 +89,6 @@ export async function protectRoute(
 
         }
 
-
-
-        /*
-            Verify JWT signature.
-
-            If token was modified,
-            verification fails.
-        */
-
         const decoded =
             jwt.verify(
 
@@ -166,17 +101,6 @@ export async function protectRoute(
                 userId: string;
 
             };
-
-
-
-        /*
-            Fetch user from database.
-
-            This confirms:
-
-            - User exists
-            - Account is active
-        */
 
         const user =
             await prisma.user.findUnique({
@@ -202,16 +126,6 @@ export async function protectRoute(
                 });
 
         }
-
-
-
-        /*
-            Attach user information.
-
-            Now controllers can access:
-
-            req.user
-        */
 
         req.user = {
 

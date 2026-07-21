@@ -4,5 +4,5 @@ POST http://localhost:5000/api/auth/logout
 Content-Type: application/json
 
 {
-    "refreshToken":"refresh token"
+    "refreshToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3NTBjNTlmMS02MzdhLTQyYzItOWNlZS1lMDNhZjEyNGI4OTIiLCJpYXQiOjE3ODQ2MDkxMjEsImV4cCI6MTc4NTIxMzkyMX0.CvkHwsc6Nfb-0y5xJQmdVTLrPlqI6MimzWOpy5iSezA"
 }

@@ -50,45 +50,11 @@ import notificationRoutes
     from "./modules/notification/notification.routes";
 
 
-/*
-    Create Express application instance.
-
-    This object represents our backend server.
-*/
 const app = express();
-
-
-
-/*
-    Security Middleware
-
-    Helmet adds security-related HTTP headers.
-
-    Example protection:
-    - prevents some common attacks
-    - improves API security
-*/
 app.use(
     helmet()
 );
 
-
-
-/*
-    CORS Middleware
-
-    Allows frontend applications
-    to communicate with backend.
-
-    Example:
-
-    Frontend:
-    http://localhost:3000
-
-    Backend:
-    http://localhost:5000
-
-*/
 app.use(
     cors({
         origin: "http://localhost:3000",
@@ -96,51 +62,14 @@ app.use(
     })
 );
 
-
-
-/*
-    JSON Body Parser
-
-    Allows Express to read JSON requests.
-
-    Example request:
-
-    {
-        "email":"test@gmail.com",
-        "password":"123456"
-    }
-
-*/
 app.use(
     express.json()
 );
 
-
-
-/*
-    Cookie Parser
-
-    Required later for:
-
-    - Refresh tokens
-    - Authentication cookies
-*/
 app.use(
     cookieParser()
 );
 
-
-
-/*
-    Basic test route.
-
-    Purpose:
-    Check whether our Express application
-    is running.
-
-    Later this will be replaced by
-    proper route modules.
-*/
 app.use(
     "/api/auth",
     authRoutes
