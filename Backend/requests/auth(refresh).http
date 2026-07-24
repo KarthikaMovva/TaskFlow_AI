@@ -4,5 +4,5 @@ POST http://localhost:5000/api/auth/refresh
 Content-Type: application/json
 
 {
-    "refreshToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3NTBjNTlmMS02MzdhLTQyYzItOWNlZS1lMDNhZjEyNGI4OTIiLCJpYXQiOjE3ODQ2MDkyMDYsImV4cCI6MTc4NTIxNDAwNn0.eRm0saPziLsERH42qLw_bHpBsNIf1Pi3EX93h-FpAkU"
+    "refreshToken":"token"
 }

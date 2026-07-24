@@ -48,6 +48,7 @@ import activityRoutes
     from "./modules/activity/activity.routes";
 import notificationRoutes
     from "./modules/notification/notification.routes";
+import aiRoutes from "./modules/ai/ai.routes";
 
 
 const app = express();
@@ -118,6 +119,7 @@ app.use(
     "/api/notifications",
     notificationRoutes
 );
+app.use("/api/ai", aiRoutes);
 
 app.get(
     "/",

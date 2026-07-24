@@ -373,3 +373,31 @@ export async function deleteNotification(
     };
 
 }
+
+export async function notificationExists(
+
+    userId: string,
+
+    title: string,
+
+    message: string
+
+) {
+
+    return prisma.notification.findFirst({
+
+        where: {
+
+            userId,
+
+            title,
+
+            message,
+
+            isRead: false
+
+        }
+
+    });
+
+}

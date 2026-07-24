@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
     "email":"harsha@gmail.com",
-    "password":"password123"
+    "password":"xyz"
 }
 
 ### Login User 2
@@ -34,5 +34,5 @@ Content-Type: application/json
 
 {
     "email": "laasya@gmail.com",
-    "password": "password123"
+    "password": "xyz"
 }
