@@ -3,13 +3,11 @@ import { z } from "zod";
 
 export const workspaceActivitySchema = z.object({
     workspaceId:
-
         z
             .string()
             .uuid(
                 "Invalid workspace id"
             )
-
 });
 
 
