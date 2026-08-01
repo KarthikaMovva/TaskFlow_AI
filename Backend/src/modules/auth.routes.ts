@@ -29,16 +29,7 @@ router.post(
 );
 router.post(
     "/login",
-    login,
-    (req, res) => {
-
-        console.log("ROUTE BODY:", req.body);
-
-        res.json({
-            received: req.body
-        });
-
-    }
+    login
 );
 router.post(
     "/refresh",
