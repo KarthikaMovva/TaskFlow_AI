@@ -1,0 +1,127 @@
+"use client";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
+import authService from "@/src/services/auth.service";
+import { loginSchema, LoginFormValues } from "@/src/schemas/auth.schema";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/src/hooks/use-auth";
+
+export default function LoginForm() {
+    const router = useRouter();
+    const { isAuthenticated, loading, login: authLogin } = useAuth();
+    const [showPassword, setShowPassword] = useState(false);
+
+    useEffect(() => {
+        if (!loading && isAuthenticated) {
+            router.replace("/");
+        }
+    }, [loading, isAuthenticated, router]);
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting }
+    } = useForm<LoginFormValues>({
+        resolver: zodResolver(loginSchema)
+    });
+
+    async function onSubmit(data: LoginFormValues) {
+        console.log("FORM SUBMITTED", data);
+        try {
+            const response = await authService.login(data);
+            console.log("LOGIN RESPONSE", response);
+
+            authLogin(
+                response.tokens.accessToken,
+                response.tokens.refreshToken
+            );
+
+            toast.success("Login successful");
+            router.replace("/");
+
+        } catch (error: any) {
+            console.error("LOGIN ERROR", error);
+
+            const message =
+                error.response?.data?.message ||
+                "Invalid email or password";
+
+            toast.error(message);
+        }
+    }
+
+    if (loading || isAuthenticated) {
+        return (
+            <div className="flex justify-center p-8">
+                <Loader2 className="h-8 w-8 animate-spin text-purple-700" />
+            </div>
+        );
+    }
+
+    return (
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="space-y-2">
+                <h1 className="text-3xl font-bold text-purple-700">
+                    Welcome Back
+                </h1>
+                <p className="text-gray-500">
+                    Sign in to continue to TaskFlow AI
+                </p>
+            </div>
+
+            <div>
+                <Input placeholder="Email" {...register("email")} />
+                {errors.email && (
+                    <p className="mt-1 text-sm text-red-500">
+                        {errors.email.message}
+                    </p>
+                )}
+            </div>
+
+            <div className="relative">
+                <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    {...register("password")}
+                />
+                <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+                >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+                {errors.password && (
+                    <p className="mt-1 text-sm text-red-500">
+                        {errors.password.message}
+                    </p>
+                )}
+            </div>
+
+            <Button
+                type="submit"
+                className="w-full bg-purple-700 hover:bg-purple-800"
+                disabled={isSubmitting}
+            >
+                {isSubmitting ? (
+                    <Loader2 className="animate-spin text-white" />
+                ) : (
+                    "Login"
+                )}
+            </Button>
+
+            <p className="text-center text-sm text-gray-600">
+                Don't have an account?{" "}
+                <Link href="/register" className="font-medium text-purple-700 hover:underline">
+                    Register
+                </Link>
+            </p>
+        </form>
+    );
+}

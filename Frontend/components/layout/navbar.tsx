@@ -1,13 +1,26 @@
+"use client";
+
 import {
     Avatar,
     AvatarFallback
 } from "@/components/ui/avatar";
 import {
-    Bell
+    Bell,
+    LogOut
 } from "lucide-react";
-
+import { useAuth } from "@/src/hooks/use-auth";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function Navbar() {
+    const { logout } = useAuth();
+    const router = useRouter();
+
+    const handleLogout = () => {
+        logout();
+        toast.success("Logged out successfully");
+        router.replace("/login");
+    };
 
     return (
         <header
@@ -40,6 +53,8 @@ export default function Navbar() {
                 <Bell
                     className="
                     text-gray-500
+                    cursor-pointer
+                    hover:text-gray-700
                     "
                     size={20}
                 />
@@ -50,9 +65,29 @@ export default function Navbar() {
                         text-purple-700
                         "
                     >
-                        HM
+                        TF
                     </AvatarFallback>
                 </Avatar>
+                <button
+                    onClick={handleLogout}
+                    title="Logout"
+                    className="
+                    flex
+                    items-center
+                    gap-2
+                    rounded-lg
+                    px-3
+                    py-1.5
+                    text-sm
+                    text-gray-600
+                    hover:bg-red-50
+                    hover:text-red-600
+                    transition
+                    "
+                >
+                    <LogOut size={18} />
+                    <span className="hidden sm:inline">Logout</span>
+                </button>
             </div>
         </header>
     );
