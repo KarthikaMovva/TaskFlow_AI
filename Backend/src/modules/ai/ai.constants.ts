@@ -1,0 +1,32 @@
+export const PROJECT_HEALTH = {
+    EXCELLENT: 90,
+    GOOD: 75,
+    WARNING: 50,
+    CRITICAL: 0
+};
+
+export const HEALTH_PENALTIES = {
+    OVERDUE_TASK: 5,
+    LOW_COMPLETION: 10,
+    VERY_LOW_COMPLETION: 20
+};
+
+export const RISK_WEIGHTS = {
+    OVERDUE: 40,
+    URGENT_PRIORITY: 30,
+    HIGH_PRIORITY: 20,
+    MEDIUM_PRIORITY: 10,
+    STALE_TASK: 10,
+    MANY_COMMENTS: 10
+};
+
+export const WORKLOAD_THRESHOLDS = {
+    NORMAL_LIMIT: 10,
+    OVERLOAD_LIMIT: 11
+};
+
+export const RISK_THRESHOLDS = {
+    CRITICAL: 80,
+    HIGH: 60,
+    MEDIUM: 40
+};
