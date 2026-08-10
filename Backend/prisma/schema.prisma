@@ -17,9 +17,9 @@ model User {
   updatedAt               DateTime             @updatedAt
   emailVerified           Boolean              @default(false)
   isActive                Boolean              @default(true)
-  aiHistory               AIHistory[]
   account                 Account?
   activities              Activity[]
+  AiHistory               AiHistory[]
   attachments             Attachment[]
   comments                Comment[]
   notifications           Notification[]
@@ -103,6 +103,7 @@ model Project {
   status      ProjectStatus @default(PLANNING)
   workspaceId String
   createdAt   DateTime      @default(now())
+  AiHistory   AiHistory[]
   workspace   Workspace     @relation(fields: [workspaceId], references: [id])
   tasks       Task[]
 }
@@ -170,27 +171,31 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
-model AIHistory {
-  id        String   @id @default(uuid())
+model Activity {
+  id          String    @id @default(uuid())
+  action      String
+  userId      String
+  workspaceId String
+  createdAt   DateTime  @default(now())
+  description String?
+  entityId    String?
+  entityType  String?
+  user        User      @relation(fields: [userId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+}
+
+model AiHistory {
+  id        String   @id
   type      AIType
   input     String
   output    String
   userId    String
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-}
-
-model Activity {
-  id          String    @id @default(uuid())
-  action      String
-  description String?
-  entityId    String?
-  entityType  String?
-  userId      String
-  workspaceId String
-  createdAt   DateTime  @default(now())
-  user        User      @relation(fields: [userId], references: [id])
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  projectId String?
+  health    String?
+  score     Int?
+  Project   Project? @relation(fields: [projectId], references: [id])
+  User      User     @relation(fields: [userId], references: [id])
 }
 
 enum Role {
@@ -224,6 +229,7 @@ enum AIType {
   TASK_GENERATION
   SPRINT_SUMMARY
   MEETING_NOTES
+  PROJECT_ANALYSIS
 }
 
 enum InvitationStatus {
