@@ -1,0 +1,37 @@
+### AI Project Insights
+
+GET http://localhost:5000/api/ai/project/ef3a8905-dcb6-470a-a349-ae7ee99db659
+Authorization: Bearer token
+
+
+### Generate AI Project Analysis
+
+POST http://localhost:5000/api/ai/project/ef3a8905-dcb6-470a-a349-ae7ee99db659/analyze
+Content-Type: application/json
+Authorization: Bearer token
+
+
+### Get Current User AI History
+
+GET http://localhost:5000/api/ai/history
+Authorization: Bearer token
+
+
+### Get AI History For One Project
+
+GET http://localhost:5000/api/ai/project/ef3a8905-dcb6-470a-a349-ae7ee99db659/history
+Authorization: Bearer token
+
+
+
+###
+### Get project trend
+###
+GET http://localhost:5000/api/ai/project/ef3a8905-dcb6-470a-a349-ae7ee99db659/trend
+Authorization: Bearer token
+
+
+### AI Dashboard Endpoint
+
+GET http://localhost:5000/api/ai/project/ef3a8905-dcb6-470a-a349-ae7ee99db659/dashboard
+Authorization: Bearer token 
