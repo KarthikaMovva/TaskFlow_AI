@@ -5,6 +5,13 @@ import {
     from "express";
 
 import prisma from "../../config/prisma";
+import { requireProjectAccess } from "../../utils/permission";
+
+interface AuthRequest extends Request {
+    user?: {
+        id: string;
+    };
+}
 
 
 /**
@@ -21,7 +28,7 @@ import prisma from "../../config/prisma";
  */
 export const getBoard = async (
 
-    req: Request,
+    req: AuthRequest,
 
     res: Response
 
@@ -34,6 +41,11 @@ export const getBoard = async (
         const {
             projectId
         } = req.params;
+
+        await requireProjectAccess(
+            projectId as string,
+            req.user!.id
+        );
 
 
 

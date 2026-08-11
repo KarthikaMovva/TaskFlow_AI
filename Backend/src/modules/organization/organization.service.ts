@@ -287,13 +287,12 @@ export async function getOrganizationMembers(
         Format response.
     */
     return members.map((member) => ({
-        membershipId: member.id,      // OrganizationMember ID
-        userId: member.user.id,       // User ID
-        name: member.user.name,
-        email: member.user.email,
-        avatar: member.user.avatar,
+        id: member.id,
+        organizationId: member.organizationId,
+        userId: member.userId,
         role: member.role,
-        joinedAt: member.joinedAt
+        joinedAt: member.joinedAt,
+        user: member.user
     }));
 
 }

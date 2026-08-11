@@ -33,6 +33,11 @@ export const taskApi = {
         return response.data.tasks || [];
     },
 
+    getByWorkspace: async (workspaceId: string): Promise<Task[]> => {
+        const response = await api.get<{ success: boolean; tasks: Task[] }>(`/tasks/workspace/${workspaceId}`);
+        return response.data.tasks || [];
+    },
+
     getById: async (taskId: string): Promise<Task> => {
         const response = await api.get<{ success: boolean; task: Task }>(`/tasks/${taskId}`);
         return response.data.task;

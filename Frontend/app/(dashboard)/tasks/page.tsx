@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { CheckSquare, Plus, Search, Filter, Calendar, User, ArrowUpDown, ChevronRight } from "lucide-react";
 import { useWorkspace } from "@/src/context/workspace-context";
 import { taskApi } from "@/src/api/task.api";
@@ -17,6 +18,8 @@ import TaskDetailSheet from "@/components/tasks/task-detail-sheet";
 import toast from "react-hot-toast";
 
 export default function TasksPage() {
+    const searchParams = useSearchParams();
+    const taskIdFromNotification = searchParams.get("taskId");
     const { projects, activeWorkspace, loading: wsLoading } = useWorkspace();
 
     const [tasks, setTasks] = useState<Task[]>([]);
@@ -40,11 +43,7 @@ export default function TasksPage() {
 
         setLoadingTasks(true);
         try {
-            let list: Task[] = [];
-            for (const p of projects) {
-                const pTasks = await taskApi.getByProject(p.id);
-                list = [...list, ...pTasks];
-            }
+            const list = await taskApi.getByWorkspace(activeWorkspace.id);
             setTasks(list);
         } catch (err) {
             toast.error("Failed to load tasks");
@@ -56,6 +55,16 @@ export default function TasksPage() {
     useEffect(() => {
         fetchAllTasks();
     }, [activeWorkspace, projects]);
+
+    useEffect(() => {
+        if (!taskIdFromNotification) return;
+
+        const taskFromNotification = tasks.find((task) => task.id === taskIdFromNotification);
+        if (taskFromNotification) {
+            setSelectedTask(taskFromNotification);
+            setDetailSheetOpen(true);
+        }
+    }, [taskIdFromNotification, tasks]);
 
     const filteredTasks = tasks.filter((t) => {
         const matchesSearch =

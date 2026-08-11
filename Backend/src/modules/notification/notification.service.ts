@@ -12,6 +12,8 @@ interface CreateNotificationInput {
 
     userId: string;
 
+    taskId?: string;
+
 
 }
 
@@ -40,7 +42,9 @@ export async function createNotification(
 
             message: data.message,
 
-            userId: data.userId
+            userId: data.userId,
+
+            taskId: data.taskId
 
         }
 

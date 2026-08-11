@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Bell, Check, Trash2, CheckCheck, Clock } from "lucide-react";
 import { notificationApi } from "@/src/api/notification.api";
 import { Notification } from "@/src/types";
@@ -11,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import toast from "react-hot-toast";
 
 export default function NotificationsPage() {
+    const router = useRouter();
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<"ALL" | "UNREAD">("ALL");
@@ -58,6 +60,19 @@ export default function NotificationsPage() {
             await fetchNotifications();
         } catch (err) {
             toast.error("Failed to delete notification");
+        }
+    };
+
+    const handleOpenTask = async (notification: Notification) => {
+        if (!notification.taskId) return;
+
+        try {
+            if (!notification.isRead) {
+                await notificationApi.markAsRead(notification.id);
+            }
+            router.push(`/tasks?taskId=${notification.taskId}`);
+        } catch (err) {
+            toast.error("Failed to open assigned task");
         }
     };
 
@@ -131,6 +146,16 @@ export default function NotificationsPage() {
                                             <Clock size={11} />
                                             <span>{new Date(n.createdAt).toLocaleString()}</span>
                                         </p>
+                                        {n.taskId && (
+                                            <Button
+                                                onClick={() => handleOpenTask(n)}
+                                                variant="ghost"
+                                                size="sm"
+                                                className="mt-1 h-auto px-0 text-xs text-purple-700 hover:bg-transparent hover:text-purple-800"
+                                            >
+                                                Open task
+                                            </Button>
+                                        )}
                                     </div>
                                     <div className="flex items-center gap-2 shrink-0">
                                         {!n.isRead && (
