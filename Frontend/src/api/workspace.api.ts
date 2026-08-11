@@ -1,5 +1,5 @@
 import api from "./client";
-import { Workspace } from "@/src/types";
+import { Workspace, WorkspaceMember } from "@/src/types";
 
 export const workspaceApi = {
     create: async (name: string, organizationId: string): Promise<Workspace> => {
@@ -15,6 +15,11 @@ export const workspaceApi = {
     getById: async (workspaceId: string): Promise<Workspace> => {
         const response = await api.get<{ success: boolean; workspace: Workspace }>(`/workspaces/${workspaceId}`);
         return response.data.workspace;
+    },
+
+    getMembers: async (workspaceId: string): Promise<WorkspaceMember[]> => {
+        const response = await api.get<{ success: boolean; members: WorkspaceMember[] }>(`/workspaces/${workspaceId}/members`);
+        return response.data.members || [];
     },
 
     update: async (workspaceId: string, name: string): Promise<Workspace> => {

@@ -2,6 +2,9 @@ import prisma from "../../config/prisma";
 import {
     createNotification
 } from "../notification/notification.service";
+import {
+    requireWorkspaceMember
+} from "../../utils/permission";
 
 interface CreateActivityInput {
 
@@ -12,6 +15,7 @@ interface CreateActivityInput {
     userId: string;
     workspaceId: string;
     notifyUserId?: string;
+    notifyTaskId?: string;
 
 
 }
@@ -40,7 +44,8 @@ export async function createActivity(
             message:
                 data.description ??
                 "New activity",
-            userId: data.notifyUserId
+            userId: data.notifyUserId,
+            taskId: data.notifyTaskId
         });
     }
 
@@ -50,4 +55,30 @@ export async function createActivity(
     return activity;
 
 
+}
+
+export async function getWorkspaceActivities(
+    workspaceId: string,
+    userId: string
+) {
+    await requireWorkspaceMember(workspaceId, userId);
+
+    return prisma.activity.findMany({
+        where: {
+            workspaceId
+        },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    avatar: true
+                }
+            }
+        },
+        orderBy: {
+            createdAt: "desc"
+        }
+    });
 }

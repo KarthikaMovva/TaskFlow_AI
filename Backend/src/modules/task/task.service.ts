@@ -10,7 +10,8 @@ import {
 
 import {
 
-    requireProjectAccess
+    requireProjectAccess,
+    requireWorkspaceMember
 
 }
     from "../../utils/permission";
@@ -250,6 +251,98 @@ export async function getProjectTasks(
 
 
     return tasks;
+
+}
+
+/*
+    Get tasks visible to the current workspace member.
+
+    OWNER/ADMIN users retain their workspace-wide task view. Regular
+    members receive only tasks assigned to them.
+*/
+export async function getWorkspaceTasks(
+
+    workspaceId: string,
+
+    userId: string
+
+) {
+
+    const membership = await requireWorkspaceMember(workspaceId, userId);
+
+    return prisma.task.findMany({
+
+        where: {
+
+            project: {
+
+                workspaceId
+
+            },
+
+            ...(membership.role === "OWNER" || membership.role === "ADMIN"
+                ? {}
+                : {
+                    assignedToId: userId
+                })
+
+        },
+
+        include: {
+
+            project: {
+
+                select: {
+
+                    id: true,
+
+                    name: true,
+
+                    workspaceId: true
+
+                }
+
+            },
+
+            assignedTo: {
+
+                select: {
+
+                    id: true,
+
+                    name: true,
+
+                    email: true,
+
+                    avatar: true
+
+                }
+
+            },
+
+            createdBy: {
+
+                select: {
+
+                    id: true,
+
+                    name: true,
+
+                    email: true
+
+                }
+
+            }
+
+        },
+
+        orderBy: {
+
+            createdAt: "desc"
+
+        }
+
+    });
 
 }
 
@@ -796,14 +889,24 @@ export async function deleteTask(
         Now permanently delete the task.
     */
 
-    await prisma.task.delete({
+    await prisma.$transaction(async (tx) => {
+        await tx.comment.deleteMany({
+            where: {
+                taskId
+            }
+        });
 
-        where: {
+        await tx.attachment.deleteMany({
+            where: {
+                taskId
+            }
+        });
 
-            id: taskId
-
-        }
-
+        await tx.task.delete({
+            where: {
+                id: taskId
+            }
+        });
     });
 
 
@@ -918,34 +1021,22 @@ export async function assignTask(
         to workspace
     */
 
-    const assigneeMembership =
-
-        await prisma.workspaceMember.findUnique({
-
-            where: {
-
-                userId_workspaceId: {
-
-                    userId:
-                        data.assignedToId,
-
-                    workspaceId:
-                        project.workspaceId
-
+    if (data.assignedToId) {
+        const assigneeMembership =
+            await prisma.workspaceMember.findUnique({
+                where: {
+                    userId_workspaceId: {
+                        userId: data.assignedToId,
+                        workspaceId: project.workspaceId
+                    }
                 }
+            });
 
-            }
-
-        });
-
-
-
-    if (!assigneeMembership) {
-
-        throw new Error(
-            "Assignee is not a member of this workspace"
-        );
-
+        if (!assigneeMembership) {
+            throw new Error(
+                "Assignee is not a member of this workspace"
+            );
+        }
     }
 
 
@@ -979,24 +1070,16 @@ export async function assignTask(
         Get assignee details
     */
 
-    const assignee =
-
-        await prisma.user.findUnique({
-
+    const assignee = data.assignedToId
+        ? await prisma.user.findUnique({
             where: {
-
-                id:
-                    data.assignedToId
-
+                id: data.assignedToId
             },
-
             select: {
-
                 name: true
-
             }
-
-        });
+        })
+        : null;
 
 
 
@@ -1016,12 +1099,14 @@ export async function assignTask(
 
         action:
 
-            "TASK_ASSIGNED",
+            data.assignedToId ? "TASK_ASSIGNED" : "TASK_UNASSIGNED",
 
 
         description:
 
-            `Assigned task "${task.title}" to ${assignee?.name}`,
+            data.assignedToId
+                ? `Assigned task "${task.title}" to ${assignee?.name}`
+                : `Unassigned task "${task.title}"`,
 
 
         entityType:
@@ -1044,7 +1129,11 @@ export async function assignTask(
 
         notifyUserId:
 
-            data.assignedToId
+            data.assignedToId ?? undefined,
+
+        notifyTaskId:
+
+            data.assignedToId ? task.id : undefined
 
     });
 

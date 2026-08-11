@@ -141,6 +141,7 @@ export const assignTaskSchema = z.object({
             .uuid(
                 "Invalid user id"
             )
+            .nullable()
 
 });
 

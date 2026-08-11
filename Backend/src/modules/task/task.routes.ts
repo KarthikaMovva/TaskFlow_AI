@@ -16,6 +16,7 @@ import {
 
     createTaskController,
     getProjectTasksController,
+    getWorkspaceTasksController,
     getTaskDetailsController,
     updateTaskController,
     deleteTaskController,
@@ -60,6 +61,16 @@ router.get(
     protectRoute,
 
     getProjectTasksController
+
+);
+
+router.get(
+
+    "/workspace/:workspaceId",
+
+    protectRoute,
+
+    getWorkspaceTasksController
 
 );
 

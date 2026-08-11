@@ -139,7 +139,7 @@ export default function SettingsPage() {
                                     </TableHeader>
                                     <TableBody>
                                         {members.map((m) => (
-                                            <TableRow key={m.id}>
+                                            <TableRow key={m.id ?? m.userId}>
                                                 <TableCell>
                                                     <div className="flex items-center gap-3">
                                                         <Avatar className="h-8 w-8">

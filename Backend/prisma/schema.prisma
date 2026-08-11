@@ -17,13 +17,9 @@ model User {
   updatedAt               DateTime             @updatedAt
   emailVerified           Boolean              @default(false)
   isActive                Boolean              @default(true)
-<<<<<<< HEAD
-=======
   aiHistory               AiHistory[]
->>>>>>> 8a0a8247eb53f9344926c230f33064a2fa58f7af
   account                 Account?
   activities              Activity[]
-  AiHistory               AiHistory[]
   attachments             Attachment[]
   comments                Comment[]
   notifications           Notification[]
@@ -95,6 +91,7 @@ model Task {
   createdAt    DateTime     @default(now())
   attachments  Attachment[]
   comments     Comment[]
+  notifications Notification[]
   assignedTo   User?        @relation("AssignedTasks", fields: [assignedToId], references: [id])
   createdBy    User         @relation("CreatedTasks", fields: [createdById], references: [id])
   project      Project      @relation(fields: [projectId], references: [id])
@@ -107,7 +104,6 @@ model Project {
   status      ProjectStatus @default(PLANNING)
   workspaceId String
   createdAt   DateTime      @default(now())
-  AiHistory   AiHistory[]
   workspace   Workspace     @relation(fields: [workspaceId], references: [id])
   tasks       Task[]
   aiHistory   AiHistory[]
@@ -153,8 +149,10 @@ model Notification {
   message   String
   isRead    Boolean  @default(false)
   userId    String
+  taskId    String?
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
 }
 
 model RefreshToken {
@@ -176,26 +174,8 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
-<<<<<<< HEAD
-model Activity {
-  id          String    @id @default(uuid())
-  action      String
-  userId      String
-  workspaceId String
-  createdAt   DateTime  @default(now())
-  description String?
-  entityId    String?
-  entityType  String?
-  user        User      @relation(fields: [userId], references: [id])
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-}
-
-model AiHistory {
-  id        String   @id
-=======
 model AiHistory {
   id        String   @id @default(uuid())
->>>>>>> 8a0a8247eb53f9344926c230f33064a2fa58f7af
   type      AIType
   projectId String?
   score     Int?
@@ -204,13 +184,6 @@ model AiHistory {
   output    String
   userId    String
   createdAt DateTime @default(now())
-<<<<<<< HEAD
-  projectId String?
-  health    String?
-  score     Int?
-  Project   Project? @relation(fields: [projectId], references: [id])
-  User      User     @relation(fields: [userId], references: [id])
-=======
   user      User     @relation(fields: [userId], references: [id])
   project   Project? @relation(fields: [projectId], references: [id])
 }
@@ -226,7 +199,6 @@ model Activity {
   entityType  String?
   user        User      @relation(fields: [userId], references: [id])
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
->>>>>>> 8a0a8247eb53f9344926c230f33064a2fa58f7af
 }
 
 enum Role {

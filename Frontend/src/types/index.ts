@@ -114,6 +114,7 @@ export interface Notification {
     message: string;
     isRead: boolean;
     userId: string;
+    taskId?: string | null;
     createdAt: string;
 }
 

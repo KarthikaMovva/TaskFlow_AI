@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import axios from "axios";
 import { Task, TaskStatus, Priority } from "@/src/types";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -46,8 +47,11 @@ export default function KanbanCard({ task, onUpdate, onClick }: KanbanCardProps)
             await taskApi.delete(task.id);
             toast.success("Task deleted");
             onUpdate();
-        } catch (err) {
-            toast.error("Failed to delete task");
+        } catch (err: unknown) {
+            const serverMessage = axios.isAxiosError<{ message?: string }>(err)
+                ? err.response?.data?.message
+                : undefined;
+            toast.error(serverMessage || "Failed to delete task");
         }
     };
 

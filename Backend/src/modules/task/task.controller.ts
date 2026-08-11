@@ -3,11 +3,16 @@ import {
     Response
 }
     from "express";
+import {
+    Prisma
+}
+    from "@prisma/client";
 
 
 import {
     createTask,
     getProjectTasks,
+    getWorkspaceTasks,
     getTaskDetails,
     updateTask,
     deleteTask,
@@ -374,18 +379,27 @@ export async function deleteTaskController(
 
     catch (error) {
 
+        const message =
+            error instanceof Error
+                ? error.message
+                : "Failed to delete task";
 
-        res.status(400).json({
+        const status =
+            message === "Task not found" || message === "Project not found"
+                ? 404
+                : message === "You are not a member of this workspace" ||
+                    message === "You don't have permission to delete this task"
+                    ? 403
+                    : error instanceof Prisma.PrismaClientKnownRequestError &&
+                        error.code === "P2003"
+                        ? 409
+                        : 500;
+
+        res.status(status).json({
 
             success: false,
 
-            message:
-
-                error instanceof Error
-
-                    ? error.message
-
-                    : "Failed"
+            message
 
         });
 
@@ -561,6 +575,56 @@ export async function reorderTasksController(
                     ? error.message
 
                     : "Failed to reorder tasks"
+
+        });
+
+    }
+
+}
+
+export async function getWorkspaceTasksController(
+
+    req: AuthRequest,
+
+    res: Response
+
+) {
+
+    try {
+
+        const tasks =
+
+            await getWorkspaceTasks(
+
+                req.params.workspaceId as string,
+
+                req.user!.id
+
+            );
+
+        res.json({
+
+            success: true,
+
+            tasks
+
+        });
+
+    }
+
+    catch (error) {
+
+        res.status(400).json({
+
+            success: false,
+
+            message:
+
+                error instanceof Error
+
+                    ? error.message
+
+                    : "Failed to fetch workspace tasks"
 
         });
 
