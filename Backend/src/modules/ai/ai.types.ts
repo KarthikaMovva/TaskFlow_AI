@@ -32,7 +32,7 @@ export interface AIAnalysisContext {
     risks?: TaskRisk[];
     workload?: UserWorkload[];
     recommendations?: AIRecommendation[];
-    narrative?: String;
+    narrative?: string;
     generatedAt: Date;
 }
 

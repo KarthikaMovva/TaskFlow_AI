@@ -7,18 +7,48 @@ import {
 import aiService from "./ai.service";
 import aiHistoryService from "./ai.history.service";
 
+/**
+ * Express Request with authenticated user information.
+ *
+ * `user` is optional here so the controller remains compatible
+ * with Express RequestHandler typing.
+ *
+ * The authentication middleware guarantees that user exists
+ * before these controllers are executed.
+ */
+type AuthenticatedRequest = Request & {
+    user?: {
+        id: string;
+    };
+};
 
+/**
+ * Safely extract a route parameter as a string.
+ *
+ * Express can type route parameters as string | string[]
+ * depending on the installed Express type definitions.
+ */
+const getParam = (value: string | string[]): string => {
+    return Array.isArray(value) ? value[0] : value;
+};
+
+
+/**
+ * Get project AI insights
+ */
 export const getProjectInsightsController = async (
-    req: Request,
+    req: AuthenticatedRequest,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
+
     try {
-        const {
-            projectId
-        } = req.params;
+
+        const projectId =
+            getParam(req.params.projectId);
+
         const userId =
-            req.user.id;
+            req.user!.id;
 
         const data =
             await aiService.getProjectInsights(
@@ -26,40 +56,36 @@ export const getProjectInsightsController = async (
                 userId
             );
 
-
-
         res.status(200).json({
             success: true,
             data
         });
 
-
     }
     catch (error) {
+
         next(error);
+
     }
-
-
 };
 
+
+/**
+ * Generate new AI project analysis
+ */
 export const generateProjectAnalysisController = async (
-    req: Request,
+    req: AuthenticatedRequest,
     res: Response,
     next: NextFunction
-) => {
-
+): Promise<void> => {
 
     try {
-        const {
-            projectId
-        } = req.params;
 
-
+        const projectId =
+            getParam(req.params.projectId);
 
         const userId =
-            req.user.id;
-
-
+            req.user!.id;
 
         const analysis =
             await aiService.generateProjectAnalysis(
@@ -67,113 +93,149 @@ export const generateProjectAnalysisController = async (
                 userId
             );
 
-
-
         res.status(201).json({
+
             success: true,
+
             message:
                 "AI analysis generated successfully",
-            data: analysis
-        });
 
+            data: analysis
+
+        });
 
     }
     catch (error) {
-        next(error);
-    }
 
-}
+        next(error);
+
+    }
+};
+
+
+/**
+ * Get AI history for the authenticated user
+ */
 export const getAIHistoryController = async (
-    req,
-    res,
-    next
-) => {
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
 
     try {
+
         const history =
-            await aiService.getHistory(
-                req.user.id
+            await aiHistoryService.getUserAIHistory(
+                req.user!.id
             );
 
         res.status(200).json({
+
             success: true,
+
             data: history
+
         });
 
     }
     catch (error) {
-        next(error);
-    }
 
+        next(error);
+
+    }
 };
 
+
+/**
+ * Get AI history for a specific project
+ */
 export const getProjectHistoryController = async (
-    req,
-    res,
-    next
-) => {
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
 
     try {
+
+        const projectId =
+            getParam(req.params.projectId);
 
         const history =
             await aiHistoryService.getProjectHistory(
-                req.params.projectId,
-                req.user.id
+                projectId
             );
 
         res.status(200).json({
+
             success: true,
+
             data: history
+
         });
 
     }
     catch (error) {
-        next(error);
-    }
 
+        next(error);
+
+    }
 };
 
-export const getProjectTrendController =
-    async (req, res, next) => {
 
-        try {
-            const result =
-                await aiService.getProjectTrend(
-                    req.params.projectId,
-                    req.user.id
-                );
-
-
-            res.status(200).json({
-                success: true,
-                data: result
-            });
-
-
-        }
-        catch (error) {
-            next(error);
-        }
-
-    };
-
-export async function getDashboardController(
-
-    req: AuthRequest,
-
-    res: Response
-
-) {
+/**
+ * Get project AI trend
+ */
+export const getProjectTrendController = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
 
     try {
 
+        const projectId =
+            getParam(req.params.projectId);
+
+        const result =
+            await aiService.getProjectTrend(
+                projectId,
+                req.user!.id
+            );
+
+        res.status(200).json({
+
+            success: true,
+
+            data: result
+
+        });
+
+    }
+    catch (error) {
+
+        next(error);
+
+    }
+};
+
+
+/**
+ * Get project AI dashboard
+ */
+export async function getDashboardController(
+    req: AuthenticatedRequest,
+    res: Response
+): Promise<void> {
+
+    try {
+
+        const projectId =
+            getParam(req.params.projectId);
+
         const dashboard =
             await aiService.getDashboard(
-
-                req.params.projectId,
-
+                projectId,
                 req.user!.id
-
             );
 
         res.status(200).json({
@@ -185,7 +247,6 @@ export async function getDashboardController(
         });
 
     }
-
     catch (error) {
 
         res.status(500).json({
@@ -200,5 +261,4 @@ export async function getDashboardController(
         });
 
     }
-
 }

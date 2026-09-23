@@ -1,12 +1,11 @@
 import {
     Request,
     Response
-}
-    from "express";
+} from "express";
+
 import {
     Prisma
-}
-    from "@prisma/client";
+} from "@prisma/client";
 
 
 import {
@@ -18,8 +17,7 @@ import {
     deleteTask,
     assignTask,
     reorderTasks
-}
-    from "./task.service";
+} from "./task.service";
 
 
 import {
@@ -27,8 +25,7 @@ import {
     updateTaskSchema,
     assignTaskSchema,
     reorderTasksSchema
-}
-    from "./task.validation";
+} from "./task.validation";
 
 
 /*
@@ -52,66 +49,52 @@ interface AuthRequest extends Request {
 }
 
 
+/*
+    Helper for Express route parameters.
+
+    Express can expose route parameters as
+    string | string[].
+
+    Our services expect a single string.
+*/
+
+function getParam(
+    value: string | string[] | undefined
+): string | undefined {
+
+    if (Array.isArray(value)) {
+
+        return value[0];
+
+    }
+
+    return value;
+
+}
+
 
 /*
     Create Task Controller
-
-    Responsibilities:
-
-    1. Validate request body
-    2. Get logged-in user
-    3. Call service
-    4. Return response
 */
 
 export async function createTaskController(
-
     req: AuthRequest,
-
     res: Response
-
 ) {
-
 
     try {
 
-
-        /*
-            Validate incoming data.
-
-            Example:
-
-            {
-                title:"Create Login API",
-                projectId:"uuid"
-            }
-
-        */
-
         const data =
-
             createTaskSchema.parse(
-
                 req.body
-
             );
 
-
-
-        /*
-            Create task
-        */
 
         const task =
-
             await createTask(
-
                 data,
-
                 req.user!.id
-
             );
-
 
 
         res.status(201).json({
@@ -125,11 +108,9 @@ export async function createTaskController(
 
         });
 
-
     }
 
     catch (error) {
-
 
         res.status(400).json({
 
@@ -145,37 +126,47 @@ export async function createTaskController(
 
         });
 
-
     }
 
-
 }
+
 
 /*
     Get tasks of a project
 */
 
 export async function getProjectTasksController(
-
     req: AuthRequest,
-
     res: Response
-
 ) {
 
     try {
 
-
-        const tasks =
-
-            await getProjectTasks(
-
-                req.params.projectId as string,
-
-                req.user!.id
-
+        const projectId =
+            getParam(
+                req.params.projectId
             );
 
+
+        if (!projectId) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Project ID is required"
+
+            });
+
+        }
+
+
+        const tasks =
+            await getProjectTasks(
+                projectId,
+                req.user!.id
+            );
 
 
         res.json({
@@ -186,11 +177,9 @@ export async function getProjectTasksController(
 
         });
 
-
     }
 
     catch (error) {
-
 
         res.status(400).json({
 
@@ -206,36 +195,47 @@ export async function getProjectTasksController(
 
         });
 
-
     }
 
 }
+
 
 /*
     Get Task Details Controller
 */
 
 export async function getTaskDetailsController(
-
     req: AuthRequest,
-
     res: Response
-
 ) {
 
     try {
 
-
-        const task =
-
-            await getTaskDetails(
-
-                req.params.taskId as string,
-
-                req.user!.id
-
+        const taskId =
+            getParam(
+                req.params.taskId
             );
 
+
+        if (!taskId) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Task ID is required"
+
+            });
+
+        }
+
+
+        const task =
+            await getTaskDetails(
+                taskId,
+                req.user!.id
+            );
 
 
         res.json({
@@ -246,11 +246,9 @@ export async function getTaskDetailsController(
 
         });
 
-
     }
 
     catch (error) {
-
 
         res.status(400).json({
 
@@ -266,44 +264,50 @@ export async function getTaskDetailsController(
 
         });
 
-
     }
 
 }
 
+
 export async function updateTaskController(
-
     req: AuthRequest,
-
     res: Response
-
 ) {
 
     try {
 
-
         const data =
-
             updateTaskSchema.parse(
-
                 req.body
-
             );
 
+
+        const taskId =
+            getParam(
+                req.params.taskId
+            );
+
+
+        if (!taskId) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Task ID is required"
+
+            });
+
+        }
 
 
         const task =
-
             await updateTask(
-
-                req.params.taskId as string,
-
+                taskId,
                 data,
-
                 req.user!.id
-
             );
-
 
 
         res.json({
@@ -317,7 +321,6 @@ export async function updateTaskController(
 
         });
 
-
     }
 
     catch (error) {
@@ -340,29 +343,42 @@ export async function updateTaskController(
 
 }
 
+
 /*
     Delete Task Controller
 */
 
 export async function deleteTaskController(
-
     req: AuthRequest,
-
     res: Response
-
 ) {
 
     try {
 
+        const taskId =
+            getParam(
+                req.params.taskId
+            );
+
+
+        if (!taskId) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Task ID is required"
+
+            });
+
+        }
+
 
         await deleteTask(
-
-            req.params.taskId as string,
-
+            taskId,
             req.user!.id
-
         );
-
 
 
         res.json({
@@ -374,26 +390,42 @@ export async function deleteTaskController(
 
         });
 
-
     }
 
     catch (error) {
 
         const message =
             error instanceof Error
+
                 ? error.message
+
                 : "Failed to delete task";
 
+
         const status =
-            message === "Task not found" || message === "Project not found"
+
+            message === "Task not found" ||
+                message === "Project not found"
+
                 ? 404
-                : message === "You are not a member of this workspace" ||
-                    message === "You don't have permission to delete this task"
+
+                : message ===
+                    "You are not a member of this workspace" ||
+
+                    message ===
+                    "You don't have permission to delete this task"
+
                     ? 403
-                    : error instanceof Prisma.PrismaClientKnownRequestError &&
+
+                    : error instanceof
+                        Prisma.PrismaClientKnownRequestError &&
+
                         error.code === "P2003"
+
                         ? 409
+
                         : 500;
+
 
         res.status(status).json({
 
@@ -407,43 +439,50 @@ export async function deleteTaskController(
 
 }
 
+
 /*
     Assign Task Controller
 */
 
 export async function assignTaskController(
-
     req: AuthRequest,
-
     res: Response
-
 ) {
 
     try {
 
-
         const data =
-
             assignTaskSchema.parse(
-
                 req.body
-
             );
 
+
+        const taskId =
+            getParam(
+                req.params.taskId
+            );
+
+
+        if (!taskId) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Task ID is required"
+
+            });
+
+        }
 
 
         const task =
-
             await assignTask(
-
-                req.params.taskId as string,
-
+                taskId,
                 data,
-
                 req.user!.id
-
             );
-
 
 
         res.json({
@@ -456,7 +495,6 @@ export async function assignTaskController(
             task
 
         });
-
 
     }
 
@@ -480,6 +518,7 @@ export async function assignTaskController(
 
 }
 
+
 /*
     =======================================================
     Reorder Tasks Controller
@@ -491,63 +530,46 @@ export async function assignTaskController(
     2. Read projectId.
     3. Call service.
     4. Return response.
-
-    This endpoint is used by the
-    Kanban drag-and-drop frontend.
-
-    The frontend sends
-
-    {
-        taskIds:[
-            "...",
-            "...",
-            "..."
-        ]
-    }
-
-    The order inside taskIds
-    becomes the order of tasks
-    inside the database.
 */
 
 export async function reorderTasksController(
-
     req: AuthRequest,
-
     res: Response
-
 ) {
 
     try {
 
-        /*
-            Validate request body.
-        */
-
         const data =
-
             reorderTasksSchema.parse(
-
                 req.body
-
             );
 
 
+        const projectId =
+            getParam(
+                req.params.projectId
+            );
 
-        /*
-            Call service.
-        */
+
+        if (!projectId) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Project ID is required"
+
+            });
+
+        }
+
 
         await reorderTasks(
-
-            req.params.projectId,
-
+            projectId,
             data,
-
             req.user!.id
-
         );
-
 
 
         return res.status(200).json({
@@ -555,7 +577,6 @@ export async function reorderTasksController(
             success: true,
 
             message:
-
                 "Tasks reordered successfully"
 
         });
@@ -582,25 +603,40 @@ export async function reorderTasksController(
 
 }
 
+
 export async function getWorkspaceTasksController(
-
     req: AuthRequest,
-
     res: Response
-
 ) {
 
     try {
 
-        const tasks =
-
-            await getWorkspaceTasks(
-
-                req.params.workspaceId as string,
-
-                req.user!.id
-
+        const workspaceId =
+            getParam(
+                req.params.workspaceId
             );
+
+
+        if (!workspaceId) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Workspace ID is required"
+
+            });
+
+        }
+
+
+        const tasks =
+            await getWorkspaceTasks(
+                workspaceId,
+                req.user!.id
+            );
+
 
         res.json({
 

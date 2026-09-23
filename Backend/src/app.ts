@@ -23,8 +23,7 @@ import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 
-import authRoutes
-    from "../src/modules/auth.routes";
+import authRoutes from "./modules/auth.routes";
 import {
     protectRoute,
     AuthRequest
