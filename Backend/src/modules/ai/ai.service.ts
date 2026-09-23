@@ -1,7 +1,10 @@
 import prisma from "../../config/prisma";
+
 import {
-    AIAnalysisContext
+    AIAnalysisContext,
+    AIReport
 } from "./ai.types";
+
 import {
     buildSummary,
     calculateHealth,
@@ -10,51 +13,59 @@ import {
     generateRecommendations,
     analyzeTrend
 } from "./ai.utils";
+
 import aiHistoryService
     from "./ai.history.service";
-import { generateNarrative } from "./ai.narrative";
+
+import {
+    generateNarrative
+} from "./ai.narrative";
+
 import {
     buildAIReport
 } from "./ai.report";
+
 import {
     buildProjectAnalysisPrompt
-}
-    from "./ai.prompt";
+} from "./ai.prompt";
+
 import aiClient
     from "./ai.llm";
-import { buildDashboard }
-    from "./ai.dashboard";
-import { buildAINotifications }
-    from "./ai.notification";
+
+import {
+    buildDashboard
+} from "./ai.dashboard";
+
+import {
+    buildAINotifications
+} from "./ai.notification";
 
 import {
     createNotification,
     notificationExists
-}
-    from "../notification/notification.service";
-
+} from "../notification/notification.service";
 
 
 class AIService {
 
+
+    /**
+     * Build all data required for AI analysis.
+     */
     private async buildContext(
-
         projectId: string,
-
         userId: string
-
     ): Promise<AIAnalysisContext> {
 
         const project =
             await prisma.project.findUnique({
 
                 where: {
-
                     id: projectId
-
                 }
 
             });
+
 
         if (!project) {
 
@@ -63,6 +74,7 @@ class AIService {
             );
 
         }
+
 
         const membership =
             await prisma.workspaceMember.findUnique({
@@ -82,6 +94,7 @@ class AIService {
 
             });
 
+
         if (!membership) {
 
             throw new Error(
@@ -90,13 +103,12 @@ class AIService {
 
         }
 
+
         const tasks =
             await prisma.task.findMany({
 
                 where: {
-
                     projectId
-
                 },
 
                 include: {
@@ -108,6 +120,7 @@ class AIService {
                 }
 
             });
+
 
         const context: AIAnalysisContext = {
 
@@ -123,53 +136,60 @@ class AIService {
 
         };
 
+
         context.health =
             calculateHealth(context);
+
 
         context.risks =
             findHighRiskTasks(context);
 
+
         context.workload =
             calculateWorkload(context);
+
 
         context.recommendations =
             generateRecommendations(context);
 
+
         context.narrative =
             generateNarrative(context);
+
 
         return context;
 
     }
 
+
+    /**
+     * Get rule-based AI project insights.
+     */
     async getProjectInsights(
-
         projectId: string,
-
         userId: string
-
     ) {
 
         const context =
             await this.buildContext(
-
                 projectId,
-
                 userId
-
             );
+
 
         return buildAIReport(
             context
         );
 
     }
+
+
+    /**
+     * Generate complete AI project analysis.
+     */
     async generateProjectAnalysis(
-
         projectId: string,
-
         userId: string
-
     ) {
 
         const context =
@@ -178,26 +198,56 @@ class AIService {
                 userId
             );
 
-        const analysis =
+
+        /**
+         * Build the complete AI report.
+         */
+        const report =
             buildAIReport(context);
+
+
+        /**
+         * Normalize optional report fields so the
+         * AIReport contract is always satisfied.
+         */
+        const analysis: AIReport = {
+
+            ...report,
+
+            risks:
+                report.risks ?? [],
+
+            workload:
+                report.workload ?? [],
+
+            recommendations:
+                report.recommendations ?? [],
+
+            narrative:
+                report.narrative?.toString() ?? "",
+
+            aiSummary:
+                report.narrative?.toString() ?? ""
+
+        };
+
+
         const notifications =
             buildAINotifications(context);
 
 
-        /*
-            Build LLM prompt
-        */
-
+        /**
+         * Build LLM prompt.
+         */
         const prompt =
             buildProjectAnalysisPrompt(
                 analysis
             );
 
 
-        /*
-            Generate AI explanation
-        */
-
+        /**
+         * Generate AI explanation.
+         */
         try {
 
             const aiSummary =
@@ -206,12 +256,9 @@ class AIService {
                 );
 
 
-
             analysis.aiSummary =
-
                 aiSummary ??
                 analysis.narrative;
-
 
         }
         catch (error) {
@@ -222,22 +269,45 @@ class AIService {
             );
 
 
+            /**
+             * Preserve the rule-based analysis
+             * when the external AI provider fails.
+             */
             analysis.aiSummary =
                 "AI explanation unavailable. Using rule-based analysis.";
 
         }
 
 
+        /**
+         * Validate project health before
+         * saving the analysis to history.
+         */
+        const health =
+            analysis.overview.health;
 
+
+        if (!health) {
+
+            throw new Error(
+                "Project health information is unavailable"
+            );
+
+        }
+
+
+        /**
+         * Save generated analysis history.
+         */
         await aiHistoryService.saveHistory(
 
             userId,
 
             projectId,
 
-            analysis.overview.health.score,
+            health.score,
 
-            analysis.overview.health.health,
+            health.health,
 
             {
                 projectId
@@ -247,7 +317,14 @@ class AIService {
 
         );
 
-        for (const notification of notifications) {
+
+        /**
+         * Create notifications.
+         */
+        for (
+            const notification
+            of notifications
+        ) {
 
             const exists =
                 await notificationExists(
@@ -260,17 +337,21 @@ class AIService {
 
                 );
 
+
             if (exists) {
 
                 continue;
 
             }
 
+
             await createNotification({
 
-                title: notification.title,
+                title:
+                    notification.title,
 
-                message: notification.message,
+                message:
+                    notification.message,
 
                 userId
 
@@ -283,22 +364,27 @@ class AIService {
 
     }
 
+
+    /**
+     * Get project AI trend.
+     */
     async getProjectTrend(
         projectId: string,
         userId: string
     ) {
 
-
         const project =
             await prisma.project.findUnique({
+
                 where: {
                     id: projectId
                 }
+
             });
 
 
-
         if (!project) {
+
             throw new Error(
                 "Project not found"
             );
@@ -306,21 +392,27 @@ class AIService {
         }
 
 
-
         const membership =
             await prisma.workspaceMember.findUnique({
+
                 where: {
+
                     userId_workspaceId: {
+
                         userId,
+
                         workspaceId:
                             project.workspaceId
+
                     }
+
                 }
+
             });
 
 
-
         if (!membership) {
+
             throw new Error(
                 "You are not a member of this workspace"
             );
@@ -328,63 +420,75 @@ class AIService {
         }
 
 
-
         const history =
             await prisma.aiHistory.findMany({
+
                 where: {
                     projectId
                 },
+
                 orderBy: {
-                    createdAt: "desc"
+
+                    createdAt:
+                        "desc"
+
                 },
+
                 take: 2,
+
                 select: {
+
                     score: true,
+
                     health: true,
+
                     createdAt: true
+
                 }
+
             });
-        return analyzeTrend(history);
+
+
+        return analyzeTrend(
+            history
+        );
 
     }
+
+
+    /**
+     * Get AI dashboard information.
+     */
     async getDashboard(
-
         projectId: string,
-
         userId: string
-
     ) {
 
         const context =
             await this.buildContext(
-
                 projectId,
-
                 userId
-
             );
+
 
         const trend =
             await this.getProjectTrend(
-
                 projectId,
-
                 userId
-
             );
+
 
         const latest =
             await prisma.aiHistory.findFirst({
 
                 where: {
-
                     projectId
-
                 },
 
                 orderBy: {
 
-                    createdAt: "desc"
+                    createdAt:
+                        "desc"
 
                 },
 
@@ -395,6 +499,7 @@ class AIService {
                 }
 
             });
+
 
         return buildDashboard(
 
@@ -402,7 +507,8 @@ class AIService {
 
             trend,
 
-            latest?.createdAt ?? null
+            latest?.createdAt ??
+            null
 
         );
 

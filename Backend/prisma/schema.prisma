@@ -13,13 +13,13 @@ model User {
   email                   String               @unique
   password                String
   avatar                  String?
-  createdAt               DateTime             @default(now())
-  updatedAt               DateTime             @updatedAt
   emailVerified           Boolean              @default(false)
   isActive                Boolean              @default(true)
-  aiHistory               AiHistory[]
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
   account                 Account?
   activities              Activity[]
+  aiHistory               AiHistory[]
   attachments             Attachment[]
   comments                Comment[]
   notifications           Notification[]
@@ -78,23 +78,23 @@ model WorkspaceMember {
 }
 
 model Task {
-  id           String       @id @default(uuid())
-  title        String
-  description  String?
-  status       TaskStatus   @default(TODO)
-  position     Float
-  priority     Priority     @default(MEDIUM)
-  projectId    String
-  assignedToId String?
-  createdById  String
-  dueDate      DateTime?
-  createdAt    DateTime     @default(now())
-  attachments  Attachment[]
-  comments     Comment[]
+  id            String         @id @default(uuid())
+  title         String
+  description   String?
+  status        TaskStatus     @default(TODO)
+  position      Float
+  priority      Priority       @default(MEDIUM)
+  projectId     String
+  assignedToId  String?
+  createdById   String
+  dueDate       DateTime?
+  createdAt     DateTime       @default(now())
+  attachments   Attachment[]
+  comments      Comment[]
   notifications Notification[]
-  assignedTo   User?        @relation("AssignedTasks", fields: [assignedToId], references: [id])
-  createdBy    User         @relation("CreatedTasks", fields: [createdById], references: [id])
-  project      Project      @relation(fields: [projectId], references: [id])
+  assignedTo    User?          @relation("AssignedTasks", fields: [assignedToId], references: [id])
+  createdBy     User           @relation("CreatedTasks", fields: [createdById], references: [id])
+  project       Project        @relation(fields: [projectId], references: [id])
 }
 
 model Project {
@@ -104,9 +104,9 @@ model Project {
   status      ProjectStatus @default(PLANNING)
   workspaceId String
   createdAt   DateTime      @default(now())
+  aiHistory   AiHistory[]
   workspace   Workspace     @relation(fields: [workspaceId], references: [id])
   tasks       Task[]
-  aiHistory   AiHistory[]
 }
 
 model Comment {
@@ -149,10 +149,10 @@ model Notification {
   message   String
   isRead    Boolean  @default(false)
   userId    String
-  taskId    String?
   createdAt DateTime @default(now())
+  taskId    String?
+  task      Task?    @relation(fields: [taskId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
-  task      Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
 }
 
 model RefreshToken {
@@ -177,15 +177,15 @@ model Account {
 model AiHistory {
   id        String   @id @default(uuid())
   type      AIType
-  projectId String?
-  score     Int?
-  health    String?
   input     String
   output    String
   userId    String
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+  projectId String?
+  health    String?
+  score     Int?
   project   Project? @relation(fields: [projectId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Activity {

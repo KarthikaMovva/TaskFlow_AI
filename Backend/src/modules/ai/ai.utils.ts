@@ -754,28 +754,35 @@ export function analyzeTrend(
             "Project health is stable.";
 
     }
-    const comparison =
-        compareHistory(
+    let comparison = null;
 
-            {
+    if (
+        previous.health !== null &&
+        current.health !== null
+    ) {
 
-                score: previousScore,
+        comparison =
+            compareHistory(
 
-                health: previous.health
+                {
+                    score:
+                        previousScore,
 
-            },
+                    health:
+                        previous.health
+                },
 
-            {
+                {
+                    score:
+                        currentScore,
 
-                score: currentScore,
+                    health:
+                        current.health
+                }
 
-                health: current.health
+            );
 
-            }
-
-        );
-
-
+    }
 
     return {
 
@@ -790,7 +797,13 @@ export function analyzeTrend(
         message,
 
         healthChange:
-            `${previous.health} → ${current.health}`,
+
+            previous.health !== null &&
+                current.health !== null
+
+                ? `${previous.health} → ${current.health}`
+
+                : "Health data unavailable",
 
         improvement:
             comparison
